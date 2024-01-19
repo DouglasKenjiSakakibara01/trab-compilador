@@ -1,0 +1,1073 @@
+Terminais sem uso na gramática
+
+    TK_TIPO
+    TK_PONTO_VIRGULA
+    TK_ENQUANTO
+
+
+Estado 26 conflitos: 9 de deslocamento/redução
+Estado 29 conflitos: 1 de deslocamento/redução
+Estado 59 conflitos: 4 de deslocamento/redução
+Estado 60 conflitos: 4 de deslocamento/redução
+Estado 61 conflitos: 4 de deslocamento/redução
+Estado 62 conflitos: 4 de deslocamento/redução
+
+
+Gramática
+
+    0 $accept: body $end
+
+    1 body: TK_PARA '(' statement ';' condition ';' statement ')' '{' body '}'
+    2     | TK_SE '(' condition ')' '{' body '}' else
+    3     | statement ';'
+    4     | body body
+    5     | TK_ESCREVA '(' TK_STRING ')' ';'
+    6     | TK_LEIA '(' TK_STRING ',' '&' TK_IDENTIFICADOR ')' ';'
+
+    7 else: TK_SENAO '{' body '}'
+
+    8 condition: value op value
+    9          | TK_VERDADEIRO
+   10          | TK_FALSO
+
+   11 value: TK_NUMERO
+   12      | TK_FLOAT
+   13      | TK_CARACTER
+   14      | TK_IDENTIFICADOR
+
+   15 statement: tipo TK_IDENTIFICADOR
+   16          | tipo TK_IDENTIFICADOR '=' expr
+   17          | TK_IDENTIFICADOR '=' expr
+   18          | statement '=' expr
+   19          | TK_IDENTIFICADOR op expr
+
+   20 op: TK_MAIOR
+   21   | TK_MAIOR_IGUAL
+   22   | TK_IGUALDADE
+   23   | TK_MENOR
+   24   | TK_MENOR_IGUAL
+   25   | TK_DIFERENTE
+
+   26 tipo: TK_TIPO_CHAR
+   27     | TK_TIPO_FLOAT
+   28     | TK_TIPO_INTEIRO
+   29     | TK_TIPO_STRING
+
+   30 expr: value
+   31     | expr '+' expr
+   32     | expr '-' expr
+   33     | expr '*' expr
+   34     | expr '/' expr
+   35     | '(' expr ')'
+
+
+Terminais, com as regras onde eles aparecem
+
+    $end (0) 0
+    '&' (38) 6
+    '(' (40) 1 2 5 6 35
+    ')' (41) 1 2 5 6 35
+    '*' (42) 33
+    '+' (43) 31
+    ',' (44) 6
+    '-' (45) 32
+    '/' (47) 34
+    ';' (59) 1 3 5 6
+    '=' (61) 16 17 18
+    '{' (123) 1 2 7
+    '}' (125) 1 2 7
+    error (256)
+    TK_TIPO (258)
+    TK_IDENTIFICADOR (259) 6 14 15 16 17 19
+    TK_PONTO_VIRGULA (260)
+    TK_TIPO_CHAR (261) 26
+    TK_TIPO_FLOAT (262) 27
+    TK_TIPO_INTEIRO (263) 28
+    TK_TIPO_STRING (264) 29
+    TK_PARA (265) 1
+    TK_ENQUANTO (266)
+    TK_NUMERO (267) 11
+    TK_SE (268) 2
+    TK_SENAO (269) 7
+    TK_MAIOR (270) 20
+    TK_MAIOR_IGUAL (271) 21
+    TK_IGUALDADE (272) 22
+    TK_MENOR (273) 23
+    TK_MENOR_IGUAL (274) 24
+    TK_DIFERENTE (275) 25
+    TK_FLOAT (276) 12
+    TK_VERDADEIRO (277) 9
+    TK_FALSO (278) 10
+    TK_LEIA (279) 6
+    TK_CARACTER (280) 13
+    TK_STRING (281) 5 6
+    TK_ESCREVA (282) 5
+
+
+Não terminais com as regras onde eles aparecem
+
+    $accept (40)
+        à esquerda: 0
+    body (41)
+        à esquerda: 1 2 3 4 5 6
+        à direita: 0 1 2 4 7
+    else (42)
+        à esquerda: 7
+        à direita: 2
+    condition (43)
+        à esquerda: 8 9 10
+        à direita: 1 2
+    value (44)
+        à esquerda: 11 12 13 14
+        à direita: 8 30
+    statement (45)
+        à esquerda: 15 16 17 18 19
+        à direita: 1 3 18
+    op (46)
+        à esquerda: 20 21 22 23 24 25
+        à direita: 8 19
+    tipo (47)
+        à esquerda: 26 27 28 29
+        à direita: 15 16
+    expr (48)
+        à esquerda: 30 31 32 33 34 35
+        à direita: 16 17 18 19 31 32 33 34 35
+
+
+Estado 0
+
+    0 $accept: • body $end
+
+    TK_IDENTIFICADOR  deslocar, e ir ao estado 1
+    TK_TIPO_CHAR      deslocar, e ir ao estado 2
+    TK_TIPO_FLOAT     deslocar, e ir ao estado 3
+    TK_TIPO_INTEIRO   deslocar, e ir ao estado 4
+    TK_TIPO_STRING    deslocar, e ir ao estado 5
+    TK_PARA           deslocar, e ir ao estado 6
+    TK_SE             deslocar, e ir ao estado 7
+    TK_LEIA           deslocar, e ir ao estado 8
+    TK_ESCREVA        deslocar, e ir ao estado 9
+
+    body       ir ao estado 10
+    statement  ir ao estado 11
+    tipo       ir ao estado 12
+
+
+Estado 1
+
+   17 statement: TK_IDENTIFICADOR • '=' expr
+   19          | TK_IDENTIFICADOR • op expr
+
+    TK_MAIOR        deslocar, e ir ao estado 13
+    TK_MAIOR_IGUAL  deslocar, e ir ao estado 14
+    TK_IGUALDADE    deslocar, e ir ao estado 15
+    TK_MENOR        deslocar, e ir ao estado 16
+    TK_MENOR_IGUAL  deslocar, e ir ao estado 17
+    TK_DIFERENTE    deslocar, e ir ao estado 18
+    '='             deslocar, e ir ao estado 19
+
+    op  ir ao estado 20
+
+
+Estado 2
+
+   26 tipo: TK_TIPO_CHAR •
+
+    $padrão  reduzir usando a regra 26 (tipo)
+
+
+Estado 3
+
+   27 tipo: TK_TIPO_FLOAT •
+
+    $padrão  reduzir usando a regra 27 (tipo)
+
+
+Estado 4
+
+   28 tipo: TK_TIPO_INTEIRO •
+
+    $padrão  reduzir usando a regra 28 (tipo)
+
+
+Estado 5
+
+   29 tipo: TK_TIPO_STRING •
+
+    $padrão  reduzir usando a regra 29 (tipo)
+
+
+Estado 6
+
+    1 body: TK_PARA • '(' statement ';' condition ';' statement ')' '{' body '}'
+
+    '('  deslocar, e ir ao estado 21
+
+
+Estado 7
+
+    2 body: TK_SE • '(' condition ')' '{' body '}' else
+
+    '('  deslocar, e ir ao estado 22
+
+
+Estado 8
+
+    6 body: TK_LEIA • '(' TK_STRING ',' '&' TK_IDENTIFICADOR ')' ';'
+
+    '('  deslocar, e ir ao estado 23
+
+
+Estado 9
+
+    5 body: TK_ESCREVA • '(' TK_STRING ')' ';'
+
+    '('  deslocar, e ir ao estado 24
+
+
+Estado 10
+
+    0 $accept: body • $end
+    4 body: body • body
+
+    $end              deslocar, e ir ao estado 25
+    TK_IDENTIFICADOR  deslocar, e ir ao estado 1
+    TK_TIPO_CHAR      deslocar, e ir ao estado 2
+    TK_TIPO_FLOAT     deslocar, e ir ao estado 3
+    TK_TIPO_INTEIRO   deslocar, e ir ao estado 4
+    TK_TIPO_STRING    deslocar, e ir ao estado 5
+    TK_PARA           deslocar, e ir ao estado 6
+    TK_SE             deslocar, e ir ao estado 7
+    TK_LEIA           deslocar, e ir ao estado 8
+    TK_ESCREVA        deslocar, e ir ao estado 9
+
+    body       ir ao estado 26
+    statement  ir ao estado 11
+    tipo       ir ao estado 12
+
+
+Estado 11
+
+    3 body: statement • ';'
+   18 statement: statement • '=' expr
+
+    ';'  deslocar, e ir ao estado 27
+    '='  deslocar, e ir ao estado 28
+
+
+Estado 12
+
+   15 statement: tipo • TK_IDENTIFICADOR
+   16          | tipo • TK_IDENTIFICADOR '=' expr
+
+    TK_IDENTIFICADOR  deslocar, e ir ao estado 29
+
+
+Estado 13
+
+   20 op: TK_MAIOR •
+
+    $padrão  reduzir usando a regra 20 (op)
+
+
+Estado 14
+
+   21 op: TK_MAIOR_IGUAL •
+
+    $padrão  reduzir usando a regra 21 (op)
+
+
+Estado 15
+
+   22 op: TK_IGUALDADE •
+
+    $padrão  reduzir usando a regra 22 (op)
+
+
+Estado 16
+
+   23 op: TK_MENOR •
+
+    $padrão  reduzir usando a regra 23 (op)
+
+
+Estado 17
+
+   24 op: TK_MENOR_IGUAL •
+
+    $padrão  reduzir usando a regra 24 (op)
+
+
+Estado 18
+
+   25 op: TK_DIFERENTE •
+
+    $padrão  reduzir usando a regra 25 (op)
+
+
+Estado 19
+
+   17 statement: TK_IDENTIFICADOR '=' • expr
+
+    TK_IDENTIFICADOR  deslocar, e ir ao estado 30
+    TK_NUMERO         deslocar, e ir ao estado 31
+    TK_FLOAT          deslocar, e ir ao estado 32
+    TK_CARACTER       deslocar, e ir ao estado 33
+    '('               deslocar, e ir ao estado 34
+
+    value  ir ao estado 35
+    expr   ir ao estado 36
+
+
+Estado 20
+
+   19 statement: TK_IDENTIFICADOR op • expr
+
+    TK_IDENTIFICADOR  deslocar, e ir ao estado 30
+    TK_NUMERO         deslocar, e ir ao estado 31
+    TK_FLOAT          deslocar, e ir ao estado 32
+    TK_CARACTER       deslocar, e ir ao estado 33
+    '('               deslocar, e ir ao estado 34
+
+    value  ir ao estado 35
+    expr   ir ao estado 37
+
+
+Estado 21
+
+    1 body: TK_PARA '(' • statement ';' condition ';' statement ')' '{' body '}'
+
+    TK_IDENTIFICADOR  deslocar, e ir ao estado 1
+    TK_TIPO_CHAR      deslocar, e ir ao estado 2
+    TK_TIPO_FLOAT     deslocar, e ir ao estado 3
+    TK_TIPO_INTEIRO   deslocar, e ir ao estado 4
+    TK_TIPO_STRING    deslocar, e ir ao estado 5
+
+    statement  ir ao estado 38
+    tipo       ir ao estado 12
+
+
+Estado 22
+
+    2 body: TK_SE '(' • condition ')' '{' body '}' else
+
+    TK_IDENTIFICADOR  deslocar, e ir ao estado 30
+    TK_NUMERO         deslocar, e ir ao estado 31
+    TK_FLOAT          deslocar, e ir ao estado 32
+    TK_VERDADEIRO     deslocar, e ir ao estado 39
+    TK_FALSO          deslocar, e ir ao estado 40
+    TK_CARACTER       deslocar, e ir ao estado 33
+
+    condition  ir ao estado 41
+    value      ir ao estado 42
+
+
+Estado 23
+
+    6 body: TK_LEIA '(' • TK_STRING ',' '&' TK_IDENTIFICADOR ')' ';'
+
+    TK_STRING  deslocar, e ir ao estado 43
+
+
+Estado 24
+
+    5 body: TK_ESCREVA '(' • TK_STRING ')' ';'
+
+    TK_STRING  deslocar, e ir ao estado 44
+
+
+Estado 25
+
+    0 $accept: body $end •
+
+    $padrão  aceitar
+
+
+Estado 26
+
+    4 body: body • body
+    4     | body body •
+
+    TK_IDENTIFICADOR  deslocar, e ir ao estado 1
+    TK_TIPO_CHAR      deslocar, e ir ao estado 2
+    TK_TIPO_FLOAT     deslocar, e ir ao estado 3
+    TK_TIPO_INTEIRO   deslocar, e ir ao estado 4
+    TK_TIPO_STRING    deslocar, e ir ao estado 5
+    TK_PARA           deslocar, e ir ao estado 6
+    TK_SE             deslocar, e ir ao estado 7
+    TK_LEIA           deslocar, e ir ao estado 8
+    TK_ESCREVA        deslocar, e ir ao estado 9
+
+    TK_IDENTIFICADOR  [reduzir usando a regra 4 (body)]
+    TK_TIPO_CHAR      [reduzir usando a regra 4 (body)]
+    TK_TIPO_FLOAT     [reduzir usando a regra 4 (body)]
+    TK_TIPO_INTEIRO   [reduzir usando a regra 4 (body)]
+    TK_TIPO_STRING    [reduzir usando a regra 4 (body)]
+    TK_PARA           [reduzir usando a regra 4 (body)]
+    TK_SE             [reduzir usando a regra 4 (body)]
+    TK_LEIA           [reduzir usando a regra 4 (body)]
+    TK_ESCREVA        [reduzir usando a regra 4 (body)]
+    $padrão           reduzir usando a regra 4 (body)
+
+    body       ir ao estado 26
+    statement  ir ao estado 11
+    tipo       ir ao estado 12
+
+
+Estado 27
+
+    3 body: statement ';' •
+
+    $padrão  reduzir usando a regra 3 (body)
+
+
+Estado 28
+
+   18 statement: statement '=' • expr
+
+    TK_IDENTIFICADOR  deslocar, e ir ao estado 30
+    TK_NUMERO         deslocar, e ir ao estado 31
+    TK_FLOAT          deslocar, e ir ao estado 32
+    TK_CARACTER       deslocar, e ir ao estado 33
+    '('               deslocar, e ir ao estado 34
+
+    value  ir ao estado 35
+    expr   ir ao estado 45
+
+
+Estado 29
+
+   15 statement: tipo TK_IDENTIFICADOR •
+   16          | tipo TK_IDENTIFICADOR • '=' expr
+
+    '='  deslocar, e ir ao estado 46
+
+    '='      [reduzir usando a regra 15 (statement)]
+    $padrão  reduzir usando a regra 15 (statement)
+
+
+Estado 30
+
+   14 value: TK_IDENTIFICADOR •
+
+    $padrão  reduzir usando a regra 14 (value)
+
+
+Estado 31
+
+   11 value: TK_NUMERO •
+
+    $padrão  reduzir usando a regra 11 (value)
+
+
+Estado 32
+
+   12 value: TK_FLOAT •
+
+    $padrão  reduzir usando a regra 12 (value)
+
+
+Estado 33
+
+   13 value: TK_CARACTER •
+
+    $padrão  reduzir usando a regra 13 (value)
+
+
+Estado 34
+
+   35 expr: '(' • expr ')'
+
+    TK_IDENTIFICADOR  deslocar, e ir ao estado 30
+    TK_NUMERO         deslocar, e ir ao estado 31
+    TK_FLOAT          deslocar, e ir ao estado 32
+    TK_CARACTER       deslocar, e ir ao estado 33
+    '('               deslocar, e ir ao estado 34
+
+    value  ir ao estado 35
+    expr   ir ao estado 47
+
+
+Estado 35
+
+   30 expr: value •
+
+    $padrão  reduzir usando a regra 30 (expr)
+
+
+Estado 36
+
+   17 statement: TK_IDENTIFICADOR '=' expr •
+   31 expr: expr • '+' expr
+   32     | expr • '-' expr
+   33     | expr • '*' expr
+   34     | expr • '/' expr
+
+    '+'  deslocar, e ir ao estado 48
+    '-'  deslocar, e ir ao estado 49
+    '*'  deslocar, e ir ao estado 50
+    '/'  deslocar, e ir ao estado 51
+
+    $padrão  reduzir usando a regra 17 (statement)
+
+
+Estado 37
+
+   19 statement: TK_IDENTIFICADOR op expr •
+   31 expr: expr • '+' expr
+   32     | expr • '-' expr
+   33     | expr • '*' expr
+   34     | expr • '/' expr
+
+    '+'  deslocar, e ir ao estado 48
+    '-'  deslocar, e ir ao estado 49
+    '*'  deslocar, e ir ao estado 50
+    '/'  deslocar, e ir ao estado 51
+
+    $padrão  reduzir usando a regra 19 (statement)
+
+
+Estado 38
+
+    1 body: TK_PARA '(' statement • ';' condition ';' statement ')' '{' body '}'
+   18 statement: statement • '=' expr
+
+    ';'  deslocar, e ir ao estado 52
+    '='  deslocar, e ir ao estado 28
+
+
+Estado 39
+
+    9 condition: TK_VERDADEIRO •
+
+    $padrão  reduzir usando a regra 9 (condition)
+
+
+Estado 40
+
+   10 condition: TK_FALSO •
+
+    $padrão  reduzir usando a regra 10 (condition)
+
+
+Estado 41
+
+    2 body: TK_SE '(' condition • ')' '{' body '}' else
+
+    ')'  deslocar, e ir ao estado 53
+
+
+Estado 42
+
+    8 condition: value • op value
+
+    TK_MAIOR        deslocar, e ir ao estado 13
+    TK_MAIOR_IGUAL  deslocar, e ir ao estado 14
+    TK_IGUALDADE    deslocar, e ir ao estado 15
+    TK_MENOR        deslocar, e ir ao estado 16
+    TK_MENOR_IGUAL  deslocar, e ir ao estado 17
+    TK_DIFERENTE    deslocar, e ir ao estado 18
+
+    op  ir ao estado 54
+
+
+Estado 43
+
+    6 body: TK_LEIA '(' TK_STRING • ',' '&' TK_IDENTIFICADOR ')' ';'
+
+    ','  deslocar, e ir ao estado 55
+
+
+Estado 44
+
+    5 body: TK_ESCREVA '(' TK_STRING • ')' ';'
+
+    ')'  deslocar, e ir ao estado 56
+
+
+Estado 45
+
+   18 statement: statement '=' expr •
+   31 expr: expr • '+' expr
+   32     | expr • '-' expr
+   33     | expr • '*' expr
+   34     | expr • '/' expr
+
+    '+'  deslocar, e ir ao estado 48
+    '-'  deslocar, e ir ao estado 49
+    '*'  deslocar, e ir ao estado 50
+    '/'  deslocar, e ir ao estado 51
+
+    $padrão  reduzir usando a regra 18 (statement)
+
+
+Estado 46
+
+   16 statement: tipo TK_IDENTIFICADOR '=' • expr
+
+    TK_IDENTIFICADOR  deslocar, e ir ao estado 30
+    TK_NUMERO         deslocar, e ir ao estado 31
+    TK_FLOAT          deslocar, e ir ao estado 32
+    TK_CARACTER       deslocar, e ir ao estado 33
+    '('               deslocar, e ir ao estado 34
+
+    value  ir ao estado 35
+    expr   ir ao estado 57
+
+
+Estado 47
+
+   31 expr: expr • '+' expr
+   32     | expr • '-' expr
+   33     | expr • '*' expr
+   34     | expr • '/' expr
+   35     | '(' expr • ')'
+
+    ')'  deslocar, e ir ao estado 58
+    '+'  deslocar, e ir ao estado 48
+    '-'  deslocar, e ir ao estado 49
+    '*'  deslocar, e ir ao estado 50
+    '/'  deslocar, e ir ao estado 51
+
+
+Estado 48
+
+   31 expr: expr '+' • expr
+
+    TK_IDENTIFICADOR  deslocar, e ir ao estado 30
+    TK_NUMERO         deslocar, e ir ao estado 31
+    TK_FLOAT          deslocar, e ir ao estado 32
+    TK_CARACTER       deslocar, e ir ao estado 33
+    '('               deslocar, e ir ao estado 34
+
+    value  ir ao estado 35
+    expr   ir ao estado 59
+
+
+Estado 49
+
+   32 expr: expr '-' • expr
+
+    TK_IDENTIFICADOR  deslocar, e ir ao estado 30
+    TK_NUMERO         deslocar, e ir ao estado 31
+    TK_FLOAT          deslocar, e ir ao estado 32
+    TK_CARACTER       deslocar, e ir ao estado 33
+    '('               deslocar, e ir ao estado 34
+
+    value  ir ao estado 35
+    expr   ir ao estado 60
+
+
+Estado 50
+
+   33 expr: expr '*' • expr
+
+    TK_IDENTIFICADOR  deslocar, e ir ao estado 30
+    TK_NUMERO         deslocar, e ir ao estado 31
+    TK_FLOAT          deslocar, e ir ao estado 32
+    TK_CARACTER       deslocar, e ir ao estado 33
+    '('               deslocar, e ir ao estado 34
+
+    value  ir ao estado 35
+    expr   ir ao estado 61
+
+
+Estado 51
+
+   34 expr: expr '/' • expr
+
+    TK_IDENTIFICADOR  deslocar, e ir ao estado 30
+    TK_NUMERO         deslocar, e ir ao estado 31
+    TK_FLOAT          deslocar, e ir ao estado 32
+    TK_CARACTER       deslocar, e ir ao estado 33
+    '('               deslocar, e ir ao estado 34
+
+    value  ir ao estado 35
+    expr   ir ao estado 62
+
+
+Estado 52
+
+    1 body: TK_PARA '(' statement ';' • condition ';' statement ')' '{' body '}'
+
+    TK_IDENTIFICADOR  deslocar, e ir ao estado 30
+    TK_NUMERO         deslocar, e ir ao estado 31
+    TK_FLOAT          deslocar, e ir ao estado 32
+    TK_VERDADEIRO     deslocar, e ir ao estado 39
+    TK_FALSO          deslocar, e ir ao estado 40
+    TK_CARACTER       deslocar, e ir ao estado 33
+
+    condition  ir ao estado 63
+    value      ir ao estado 42
+
+
+Estado 53
+
+    2 body: TK_SE '(' condition ')' • '{' body '}' else
+
+    '{'  deslocar, e ir ao estado 64
+
+
+Estado 54
+
+    8 condition: value op • value
+
+    TK_IDENTIFICADOR  deslocar, e ir ao estado 30
+    TK_NUMERO         deslocar, e ir ao estado 31
+    TK_FLOAT          deslocar, e ir ao estado 32
+    TK_CARACTER       deslocar, e ir ao estado 33
+
+    value  ir ao estado 65
+
+
+Estado 55
+
+    6 body: TK_LEIA '(' TK_STRING ',' • '&' TK_IDENTIFICADOR ')' ';'
+
+    '&'  deslocar, e ir ao estado 66
+
+
+Estado 56
+
+    5 body: TK_ESCREVA '(' TK_STRING ')' • ';'
+
+    ';'  deslocar, e ir ao estado 67
+
+
+Estado 57
+
+   16 statement: tipo TK_IDENTIFICADOR '=' expr •
+   31 expr: expr • '+' expr
+   32     | expr • '-' expr
+   33     | expr • '*' expr
+   34     | expr • '/' expr
+
+    '+'  deslocar, e ir ao estado 48
+    '-'  deslocar, e ir ao estado 49
+    '*'  deslocar, e ir ao estado 50
+    '/'  deslocar, e ir ao estado 51
+
+    $padrão  reduzir usando a regra 16 (statement)
+
+
+Estado 58
+
+   35 expr: '(' expr ')' •
+
+    $padrão  reduzir usando a regra 35 (expr)
+
+
+Estado 59
+
+   31 expr: expr • '+' expr
+   31     | expr '+' expr •
+   32     | expr • '-' expr
+   33     | expr • '*' expr
+   34     | expr • '/' expr
+
+    '+'  deslocar, e ir ao estado 48
+    '-'  deslocar, e ir ao estado 49
+    '*'  deslocar, e ir ao estado 50
+    '/'  deslocar, e ir ao estado 51
+
+    '+'      [reduzir usando a regra 31 (expr)]
+    '-'      [reduzir usando a regra 31 (expr)]
+    '*'      [reduzir usando a regra 31 (expr)]
+    '/'      [reduzir usando a regra 31 (expr)]
+    $padrão  reduzir usando a regra 31 (expr)
+
+
+Estado 60
+
+   31 expr: expr • '+' expr
+   32     | expr • '-' expr
+   32     | expr '-' expr •
+   33     | expr • '*' expr
+   34     | expr • '/' expr
+
+    '+'  deslocar, e ir ao estado 48
+    '-'  deslocar, e ir ao estado 49
+    '*'  deslocar, e ir ao estado 50
+    '/'  deslocar, e ir ao estado 51
+
+    '+'      [reduzir usando a regra 32 (expr)]
+    '-'      [reduzir usando a regra 32 (expr)]
+    '*'      [reduzir usando a regra 32 (expr)]
+    '/'      [reduzir usando a regra 32 (expr)]
+    $padrão  reduzir usando a regra 32 (expr)
+
+
+Estado 61
+
+   31 expr: expr • '+' expr
+   32     | expr • '-' expr
+   33     | expr • '*' expr
+   33     | expr '*' expr •
+   34     | expr • '/' expr
+
+    '+'  deslocar, e ir ao estado 48
+    '-'  deslocar, e ir ao estado 49
+    '*'  deslocar, e ir ao estado 50
+    '/'  deslocar, e ir ao estado 51
+
+    '+'      [reduzir usando a regra 33 (expr)]
+    '-'      [reduzir usando a regra 33 (expr)]
+    '*'      [reduzir usando a regra 33 (expr)]
+    '/'      [reduzir usando a regra 33 (expr)]
+    $padrão  reduzir usando a regra 33 (expr)
+
+
+Estado 62
+
+   31 expr: expr • '+' expr
+   32     | expr • '-' expr
+   33     | expr • '*' expr
+   34     | expr • '/' expr
+   34     | expr '/' expr •
+
+    '+'  deslocar, e ir ao estado 48
+    '-'  deslocar, e ir ao estado 49
+    '*'  deslocar, e ir ao estado 50
+    '/'  deslocar, e ir ao estado 51
+
+    '+'      [reduzir usando a regra 34 (expr)]
+    '-'      [reduzir usando a regra 34 (expr)]
+    '*'      [reduzir usando a regra 34 (expr)]
+    '/'      [reduzir usando a regra 34 (expr)]
+    $padrão  reduzir usando a regra 34 (expr)
+
+
+Estado 63
+
+    1 body: TK_PARA '(' statement ';' condition • ';' statement ')' '{' body '}'
+
+    ';'  deslocar, e ir ao estado 68
+
+
+Estado 64
+
+    2 body: TK_SE '(' condition ')' '{' • body '}' else
+
+    TK_IDENTIFICADOR  deslocar, e ir ao estado 1
+    TK_TIPO_CHAR      deslocar, e ir ao estado 2
+    TK_TIPO_FLOAT     deslocar, e ir ao estado 3
+    TK_TIPO_INTEIRO   deslocar, e ir ao estado 4
+    TK_TIPO_STRING    deslocar, e ir ao estado 5
+    TK_PARA           deslocar, e ir ao estado 6
+    TK_SE             deslocar, e ir ao estado 7
+    TK_LEIA           deslocar, e ir ao estado 8
+    TK_ESCREVA        deslocar, e ir ao estado 9
+
+    body       ir ao estado 69
+    statement  ir ao estado 11
+    tipo       ir ao estado 12
+
+
+Estado 65
+
+    8 condition: value op value •
+
+    $padrão  reduzir usando a regra 8 (condition)
+
+
+Estado 66
+
+    6 body: TK_LEIA '(' TK_STRING ',' '&' • TK_IDENTIFICADOR ')' ';'
+
+    TK_IDENTIFICADOR  deslocar, e ir ao estado 70
+
+
+Estado 67
+
+    5 body: TK_ESCREVA '(' TK_STRING ')' ';' •
+
+    $padrão  reduzir usando a regra 5 (body)
+
+
+Estado 68
+
+    1 body: TK_PARA '(' statement ';' condition ';' • statement ')' '{' body '}'
+
+    TK_IDENTIFICADOR  deslocar, e ir ao estado 1
+    TK_TIPO_CHAR      deslocar, e ir ao estado 2
+    TK_TIPO_FLOAT     deslocar, e ir ao estado 3
+    TK_TIPO_INTEIRO   deslocar, e ir ao estado 4
+    TK_TIPO_STRING    deslocar, e ir ao estado 5
+
+    statement  ir ao estado 71
+    tipo       ir ao estado 12
+
+
+Estado 69
+
+    2 body: TK_SE '(' condition ')' '{' body • '}' else
+    4     | body • body
+
+    TK_IDENTIFICADOR  deslocar, e ir ao estado 1
+    TK_TIPO_CHAR      deslocar, e ir ao estado 2
+    TK_TIPO_FLOAT     deslocar, e ir ao estado 3
+    TK_TIPO_INTEIRO   deslocar, e ir ao estado 4
+    TK_TIPO_STRING    deslocar, e ir ao estado 5
+    TK_PARA           deslocar, e ir ao estado 6
+    TK_SE             deslocar, e ir ao estado 7
+    TK_LEIA           deslocar, e ir ao estado 8
+    TK_ESCREVA        deslocar, e ir ao estado 9
+    '}'               deslocar, e ir ao estado 72
+
+    body       ir ao estado 26
+    statement  ir ao estado 11
+    tipo       ir ao estado 12
+
+
+Estado 70
+
+    6 body: TK_LEIA '(' TK_STRING ',' '&' TK_IDENTIFICADOR • ')' ';'
+
+    ')'  deslocar, e ir ao estado 73
+
+
+Estado 71
+
+    1 body: TK_PARA '(' statement ';' condition ';' statement • ')' '{' body '}'
+   18 statement: statement • '=' expr
+
+    ')'  deslocar, e ir ao estado 74
+    '='  deslocar, e ir ao estado 28
+
+
+Estado 72
+
+    2 body: TK_SE '(' condition ')' '{' body '}' • else
+
+    TK_SENAO  deslocar, e ir ao estado 75
+
+    else  ir ao estado 76
+
+
+Estado 73
+
+    6 body: TK_LEIA '(' TK_STRING ',' '&' TK_IDENTIFICADOR ')' • ';'
+
+    ';'  deslocar, e ir ao estado 77
+
+
+Estado 74
+
+    1 body: TK_PARA '(' statement ';' condition ';' statement ')' • '{' body '}'
+
+    '{'  deslocar, e ir ao estado 78
+
+
+Estado 75
+
+    7 else: TK_SENAO • '{' body '}'
+
+    '{'  deslocar, e ir ao estado 79
+
+
+Estado 76
+
+    2 body: TK_SE '(' condition ')' '{' body '}' else •
+
+    $padrão  reduzir usando a regra 2 (body)
+
+
+Estado 77
+
+    6 body: TK_LEIA '(' TK_STRING ',' '&' TK_IDENTIFICADOR ')' ';' •
+
+    $padrão  reduzir usando a regra 6 (body)
+
+
+Estado 78
+
+    1 body: TK_PARA '(' statement ';' condition ';' statement ')' '{' • body '}'
+
+    TK_IDENTIFICADOR  deslocar, e ir ao estado 1
+    TK_TIPO_CHAR      deslocar, e ir ao estado 2
+    TK_TIPO_FLOAT     deslocar, e ir ao estado 3
+    TK_TIPO_INTEIRO   deslocar, e ir ao estado 4
+    TK_TIPO_STRING    deslocar, e ir ao estado 5
+    TK_PARA           deslocar, e ir ao estado 6
+    TK_SE             deslocar, e ir ao estado 7
+    TK_LEIA           deslocar, e ir ao estado 8
+    TK_ESCREVA        deslocar, e ir ao estado 9
+
+    body       ir ao estado 80
+    statement  ir ao estado 11
+    tipo       ir ao estado 12
+
+
+Estado 79
+
+    7 else: TK_SENAO '{' • body '}'
+
+    TK_IDENTIFICADOR  deslocar, e ir ao estado 1
+    TK_TIPO_CHAR      deslocar, e ir ao estado 2
+    TK_TIPO_FLOAT     deslocar, e ir ao estado 3
+    TK_TIPO_INTEIRO   deslocar, e ir ao estado 4
+    TK_TIPO_STRING    deslocar, e ir ao estado 5
+    TK_PARA           deslocar, e ir ao estado 6
+    TK_SE             deslocar, e ir ao estado 7
+    TK_LEIA           deslocar, e ir ao estado 8
+    TK_ESCREVA        deslocar, e ir ao estado 9
+
+    body       ir ao estado 81
+    statement  ir ao estado 11
+    tipo       ir ao estado 12
+
+
+Estado 80
+
+    1 body: TK_PARA '(' statement ';' condition ';' statement ')' '{' body • '}'
+    4     | body • body
+
+    TK_IDENTIFICADOR  deslocar, e ir ao estado 1
+    TK_TIPO_CHAR      deslocar, e ir ao estado 2
+    TK_TIPO_FLOAT     deslocar, e ir ao estado 3
+    TK_TIPO_INTEIRO   deslocar, e ir ao estado 4
+    TK_TIPO_STRING    deslocar, e ir ao estado 5
+    TK_PARA           deslocar, e ir ao estado 6
+    TK_SE             deslocar, e ir ao estado 7
+    TK_LEIA           deslocar, e ir ao estado 8
+    TK_ESCREVA        deslocar, e ir ao estado 9
+    '}'               deslocar, e ir ao estado 82
+
+    body       ir ao estado 26
+    statement  ir ao estado 11
+    tipo       ir ao estado 12
+
+
+Estado 81
+
+    4 body: body • body
+    7 else: TK_SENAO '{' body • '}'
+
+    TK_IDENTIFICADOR  deslocar, e ir ao estado 1
+    TK_TIPO_CHAR      deslocar, e ir ao estado 2
+    TK_TIPO_FLOAT     deslocar, e ir ao estado 3
+    TK_TIPO_INTEIRO   deslocar, e ir ao estado 4
+    TK_TIPO_STRING    deslocar, e ir ao estado 5
+    TK_PARA           deslocar, e ir ao estado 6
+    TK_SE             deslocar, e ir ao estado 7
+    TK_LEIA           deslocar, e ir ao estado 8
+    TK_ESCREVA        deslocar, e ir ao estado 9
+    '}'               deslocar, e ir ao estado 83
+
+    body       ir ao estado 26
+    statement  ir ao estado 11
+    tipo       ir ao estado 12
+
+
+Estado 82
+
+    1 body: TK_PARA '(' statement ';' condition ';' statement ')' '{' body '}' •
+
+    $padrão  reduzir usando a regra 1 (body)
+
+
+Estado 83
+
+    7 else: TK_SENAO '{' body '}' •
+
+    $padrão  reduzir usando a regra 7 (else)

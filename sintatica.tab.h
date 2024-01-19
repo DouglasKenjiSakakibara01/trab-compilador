@@ -35,8 +35,8 @@
    especially those whose name start with YY_ or yy_.  They are
    private implementation details that can be changed or removed.  */
 
-#ifndef YY_YY_Y_TAB_H_INCLUDED
-# define YY_YY_Y_TAB_H_INCLUDED
+#ifndef YY_YY_SINTATICA_TAB_H_INCLUDED
+# define YY_YY_SINTATICA_TAB_H_INCLUDED
 /* Debug traces.  */
 #ifndef YYDEBUG
 # define YYDEBUG 0
@@ -88,42 +88,6 @@ extern int yydebug;
   };
   typedef enum yytokentype yytoken_kind_t;
 #endif
-/* Token kinds.  */
-#define YYEMPTY -2
-#define YYEOF 0
-#define YYerror 256
-#define YYUNDEF 257
-#define TK_TIPO 258
-#define TK_IDENTIFICADOR 259
-#define TK_PONTO_VIRGULA 260
-#define TK_TIPO_CHAR 261
-#define TK_TIPO_FLOAT 262
-#define TK_TIPO_INTEIRO 263
-#define TK_TIPO_STRING 264
-#define TK_PARA 265
-#define TK_ENQUANTO 266
-#define TK_NUMERO 267
-#define TK_SE 268
-#define TK_SENAO 269
-#define TK_MAIOR 270
-#define TK_MAIOR_IGUAL 271
-#define TK_IGUALDADE 272
-#define TK_MENOR 273
-#define TK_MENOR_IGUAL 274
-#define TK_DIFERENTE 275
-#define TK_FLOAT 276
-#define TK_VERDADEIRO 277
-#define TK_FALSO 278
-#define TK_LEIA 279
-#define TK_CARACTER 280
-#define TK_STRING 281
-#define TK_ESCREVA 282
-#define TK_INCLUDE 283
-#define TK_RETORNE 284
-#define TK_CABECALHO 285
-#define TK_TIPO_VAZIO 286
-#define TK_CLASSE 287
-#define TK_COMENTARIO 288
 
 /* Value type.  */
 #if ! defined YYSTYPE && ! defined YYSTYPE_IS_DECLARED
@@ -137,4 +101,4 @@ extern YYSTYPE yylval;
 
 int yyparse (void);
 
-#endif /* !YY_YY_Y_TAB_H_INCLUDED  */
+#endif /* !YY_YY_SINTATICA_TAB_H_INCLUDED  */

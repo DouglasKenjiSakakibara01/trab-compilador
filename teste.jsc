@@ -1,1 +1,5 @@
-INT a
+#INCLUDE <stdio.h>
+INT teste(){
+    INT a=0;
+    RETORNE 0;
+}

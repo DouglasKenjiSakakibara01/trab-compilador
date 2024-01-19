@@ -94,7 +94,7 @@ int query;
 char type[10];
 extern int count_line; // representa a linha do codigo analisada 
 
-#line 98 "y.tab.c"
+#line 98 "sintatica.tab.c"
 
 # ifndef YY_CAST
 #  ifdef __cplusplus
@@ -117,111 +117,7 @@ extern int count_line; // representa a linha do codigo analisada
 #  endif
 # endif
 
-/* Use api.header.include to #include this header
-   instead of duplicating it here.  */
-#ifndef YY_YY_Y_TAB_H_INCLUDED
-# define YY_YY_Y_TAB_H_INCLUDED
-/* Debug traces.  */
-#ifndef YYDEBUG
-# define YYDEBUG 0
-#endif
-#if YYDEBUG
-extern int yydebug;
-#endif
-
-/* Token kinds.  */
-#ifndef YYTOKENTYPE
-# define YYTOKENTYPE
-  enum yytokentype
-  {
-    YYEMPTY = -2,
-    YYEOF = 0,                     /* "end of file"  */
-    YYerror = 256,                 /* error  */
-    YYUNDEF = 257,                 /* "invalid token"  */
-    TK_TIPO = 258,                 /* TK_TIPO  */
-    TK_IDENTIFICADOR = 259,        /* TK_IDENTIFICADOR  */
-    TK_PONTO_VIRGULA = 260,        /* TK_PONTO_VIRGULA  */
-    TK_TIPO_CHAR = 261,            /* TK_TIPO_CHAR  */
-    TK_TIPO_FLOAT = 262,           /* TK_TIPO_FLOAT  */
-    TK_TIPO_INTEIRO = 263,         /* TK_TIPO_INTEIRO  */
-    TK_TIPO_STRING = 264,          /* TK_TIPO_STRING  */
-    TK_PARA = 265,                 /* TK_PARA  */
-    TK_ENQUANTO = 266,             /* TK_ENQUANTO  */
-    TK_NUMERO = 267,               /* TK_NUMERO  */
-    TK_SE = 268,                   /* TK_SE  */
-    TK_SENAO = 269,                /* TK_SENAO  */
-    TK_MAIOR = 270,                /* TK_MAIOR  */
-    TK_MAIOR_IGUAL = 271,          /* TK_MAIOR_IGUAL  */
-    TK_IGUALDADE = 272,            /* TK_IGUALDADE  */
-    TK_MENOR = 273,                /* TK_MENOR  */
-    TK_MENOR_IGUAL = 274,          /* TK_MENOR_IGUAL  */
-    TK_DIFERENTE = 275,            /* TK_DIFERENTE  */
-    TK_FLOAT = 276,                /* TK_FLOAT  */
-    TK_VERDADEIRO = 277,           /* TK_VERDADEIRO  */
-    TK_FALSO = 278,                /* TK_FALSO  */
-    TK_LEIA = 279,                 /* TK_LEIA  */
-    TK_CARACTER = 280,             /* TK_CARACTER  */
-    TK_STRING = 281,               /* TK_STRING  */
-    TK_ESCREVA = 282,              /* TK_ESCREVA  */
-    TK_INCLUDE = 283,              /* TK_INCLUDE  */
-    TK_RETORNE = 284,              /* TK_RETORNE  */
-    TK_CABECALHO = 285,            /* TK_CABECALHO  */
-    TK_TIPO_VAZIO = 286,           /* TK_TIPO_VAZIO  */
-    TK_CLASSE = 287,               /* TK_CLASSE  */
-    TK_COMENTARIO = 288            /* TK_COMENTARIO  */
-  };
-  typedef enum yytokentype yytoken_kind_t;
-#endif
-/* Token kinds.  */
-#define YYEMPTY -2
-#define YYEOF 0
-#define YYerror 256
-#define YYUNDEF 257
-#define TK_TIPO 258
-#define TK_IDENTIFICADOR 259
-#define TK_PONTO_VIRGULA 260
-#define TK_TIPO_CHAR 261
-#define TK_TIPO_FLOAT 262
-#define TK_TIPO_INTEIRO 263
-#define TK_TIPO_STRING 264
-#define TK_PARA 265
-#define TK_ENQUANTO 266
-#define TK_NUMERO 267
-#define TK_SE 268
-#define TK_SENAO 269
-#define TK_MAIOR 270
-#define TK_MAIOR_IGUAL 271
-#define TK_IGUALDADE 272
-#define TK_MENOR 273
-#define TK_MENOR_IGUAL 274
-#define TK_DIFERENTE 275
-#define TK_FLOAT 276
-#define TK_VERDADEIRO 277
-#define TK_FALSO 278
-#define TK_LEIA 279
-#define TK_CARACTER 280
-#define TK_STRING 281
-#define TK_ESCREVA 282
-#define TK_INCLUDE 283
-#define TK_RETORNE 284
-#define TK_CABECALHO 285
-#define TK_TIPO_VAZIO 286
-#define TK_CLASSE 287
-#define TK_COMENTARIO 288
-
-/* Value type.  */
-#if ! defined YYSTYPE && ! defined YYSTYPE_IS_DECLARED
-typedef int YYSTYPE;
-# define YYSTYPE_IS_TRIVIAL 1
-# define YYSTYPE_IS_DECLARED 1
-#endif
-
-
-extern YYSTYPE yylval;
-
-int yyparse (void);
-
-#endif /* !YY_YY_Y_TAB_H_INCLUDED  */
+#include "sintatica.tab.h"
 /* Symbol kind.  */
 enum yysymbol_kind_t
 {
@@ -1334,119 +1230,119 @@ yyreduce:
   case 4: /* headers: TK_INCLUDE  */
 #line 39 "sintatica.y"
              {add('h');}
-#line 1338 "y.tab.c"
+#line 1234 "sintatica.tab.c"
     break;
 
   case 5: /* main: type TK_IDENTIFICADOR  */
 #line 42 "sintatica.y"
                             {add('f');}
-#line 1344 "y.tab.c"
+#line 1240 "sintatica.tab.c"
     break;
 
   case 6: /* $@1: %empty  */
 #line 45 "sintatica.y"
               { add('k'); }
-#line 1350 "y.tab.c"
+#line 1246 "sintatica.tab.c"
     break;
 
   case 8: /* $@2: %empty  */
 #line 46 "sintatica.y"
         { add('k'); }
-#line 1356 "y.tab.c"
+#line 1252 "sintatica.tab.c"
     break;
 
   case 12: /* $@3: %empty  */
 #line 49 "sintatica.y"
              { add('k'); }
-#line 1362 "y.tab.c"
+#line 1258 "sintatica.tab.c"
     break;
 
   case 14: /* $@4: %empty  */
 #line 50 "sintatica.y"
           { add('k'); }
-#line 1368 "y.tab.c"
+#line 1264 "sintatica.tab.c"
     break;
 
   case 16: /* $@5: %empty  */
 #line 53 "sintatica.y"
                { add('k'); }
-#line 1374 "y.tab.c"
+#line 1270 "sintatica.tab.c"
     break;
 
   case 21: /* value: TK_NUMERO  */
 #line 61 "sintatica.y"
                  { add('c');}
-#line 1380 "y.tab.c"
+#line 1276 "sintatica.tab.c"
     break;
 
   case 22: /* value: TK_FLOAT  */
 #line 62 "sintatica.y"
            { add('c');}
-#line 1386 "y.tab.c"
+#line 1282 "sintatica.tab.c"
     break;
 
   case 23: /* value: TK_CARACTER  */
 #line 63 "sintatica.y"
               { add('c');}
-#line 1392 "y.tab.c"
+#line 1288 "sintatica.tab.c"
     break;
 
   case 25: /* statement: type TK_IDENTIFICADOR  */
 #line 67 "sintatica.y"
                                  { add('v'); }
-#line 1398 "y.tab.c"
+#line 1294 "sintatica.tab.c"
     break;
 
   case 26: /* $@6: %empty  */
 #line 68 "sintatica.y"
                         { add('v'); }
-#line 1404 "y.tab.c"
+#line 1300 "sintatica.tab.c"
     break;
 
   case 41: /* expr: value  */
 #line 90 "sintatica.y"
                  { yyval = yyvsp[0]; }
-#line 1410 "y.tab.c"
+#line 1306 "sintatica.tab.c"
     break;
 
   case 42: /* expr: expr '+' expr  */
 #line 91 "sintatica.y"
                  { yyval = yyvsp[-2] + yyvsp[0]; }
-#line 1416 "y.tab.c"
+#line 1312 "sintatica.tab.c"
     break;
 
   case 43: /* expr: expr '-' expr  */
 #line 92 "sintatica.y"
                  { yyval = yyvsp[-2] - yyvsp[0]; }
-#line 1422 "y.tab.c"
+#line 1318 "sintatica.tab.c"
     break;
 
   case 44: /* expr: expr '*' expr  */
 #line 93 "sintatica.y"
                  { yyval = yyvsp[-2] * yyvsp[0]; }
-#line 1428 "y.tab.c"
+#line 1324 "sintatica.tab.c"
     break;
 
   case 45: /* expr: expr '/' expr  */
 #line 94 "sintatica.y"
                  { yyval = yyvsp[-2] / yyvsp[0]; }
-#line 1434 "y.tab.c"
+#line 1330 "sintatica.tab.c"
     break;
 
   case 46: /* expr: '(' expr ')'  */
 #line 95 "sintatica.y"
                  { yyval = yyvsp[-1]; }
-#line 1440 "y.tab.c"
+#line 1336 "sintatica.tab.c"
     break;
 
   case 47: /* $@7: %empty  */
 #line 98 "sintatica.y"
                    { add('k'); }
-#line 1446 "y.tab.c"
+#line 1342 "sintatica.tab.c"
     break;
 
 
-#line 1450 "y.tab.c"
+#line 1346 "sintatica.tab.c"
 
       default: break;
     }

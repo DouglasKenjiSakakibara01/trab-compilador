@@ -5,26 +5,25 @@
 #include <stdlib.h>
 #include "y.tab.h"
 
+int count_line=0;
+
 %}
 
 %option noyywrap
 %option yylineno
 
-
+pontuacao "("|")"|"{"|"}"|";"
 %%
 
-[ \t\n]        ; // ignora espaços em branco, tabulações e quebras de linha
-[0-9]+          { printf("[%s]: TK_NUMERO\n",yytext);}
+[ \t]         ; // ignora espaços em branco e tabulações 
+{pontuacao}   {printf("[%s]: Delimitador\n",yytext);}
+[-]?[0-9]+          { printf("[%s]: TK_NUMERO\n",yytext); }
+[-]?[0-9]+\.[0-9]{1,6}   { printf("[%s]: TK_FLOAT\n",yytext); }
 ["].*["]        { printf("[%s]: TK_STRING\n",yytext);}
 ['].[']         { printf("[%s]: TK_CARACTER\n",yytext);}
 [a-z_][a-z0-9_]* { printf("[%s]: TK_IDENTIFICADOR\n",yytext);}
-"("            { printf("[%s]: TK_ABRE_PARENTESES\n",yytext);}
-")"            { printf("[%s]: TK_FECHA_PARENTESES\n",yytext);}
-"{"            { printf("[%s]: TK_ABRE_CHAVES\n",yytext); }
-"}"            { printf("[%s]: TK_FECHA_PARENTESES\n",yytext); }
-"="           { printf("[%s]: TK_ATRIBUICAO\n",yytext);}
+"="             { printf("[%s]: Atribuicao\n",yytext);}
 "=="            { printf("[%s]: TK_IGUALDADE\n",yytext);}
-";"            { printf("[%s]: TK_PONTO_VIRGULA\n",yytext); }
 ">"            { printf("[%s]: TK_MAIOR\n",yytext);}
 "<"            { printf("[%s]: TK_MENOR\n",yytext);}
 ">="           { printf("[%s]: TK_MAIOR_IGUAL\n",yytext);}
@@ -34,6 +33,7 @@
 "FLOAT"        { printf("[%s]: TK_TIPO_FLOAT\n",yytext);}
 "CHAR"         { printf("[%s]: TK_TIPO_CHAR\n",yytext);}
 "STRING"       { printf("[%s]: TK_TIPO_STRING\n",yytext);}
+"VAZIO"        { printf("[%s]: TK_TIPO_VAZIO\n",yytext);}
 "//"           { printf("[%s]: TK_COMENTARIO\n",yytext);}
 "CLASSE"        { printf("[%s]: TK_CLASSE\n",yytext);}
 "PARA"        { printf("[%s]: TK_PARA\n",yytext);}
@@ -45,11 +45,8 @@
 "LEIA"        { printf("[%s]: TK_LEIA\n",yytext);}
 "VERDADEIRO"        { printf("[%s]: TK_VERDADEIRO\n",yytext);}
 "FALSO"        { printf("[%s]: TK_FALSO\n",yytext);}
+^"#INCLUDE"[ ]*<.+\.h>           { printf("[%s]: TK_CABECALHO\n",yytext);}
+[/n]           {count_line++;}
 
-
-
-
-
-.              { printf("Erro de sintaxe na linha %d: %s\n", yylineno, yytext);} //qualquer outro caractere que nao esteja definido na gramatica
-
+.              { printf("Erro lexico na linha %d: %s\n", yylineno, yytext);} //qualquer outro caractere que nao esteja definido na gramatica
 %%
