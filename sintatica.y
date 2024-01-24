@@ -8,7 +8,7 @@
 void yyerror(const char *s);
 int yylex();
 void add(char);
-//void insert_type();
+void insert_type();
 int search(char *);
 
 struct data {
@@ -25,18 +25,25 @@ char type[10];
 extern int count_line; // representa a linha do codigo analisada 
 %}
 
+%define parse.error verbose
 
 %token TK_TIPO TK_IDENTIFICADOR TK_PONTO_VIRGULA TK_TIPO_CHAR TK_TIPO_FLOAT TK_TIPO_INTEIRO TK_TIPO_STRING TK_PARA TK_ENQUANTO TK_NUMERO
 TK_SE TK_SENAO TK_MAIOR TK_MAIOR_IGUAL TK_IGUALDADE TK_MENOR TK_MENOR_IGUAL TK_DIFERENTE TK_FLOAT TK_VERDADEIRO TK_FALSO
 TK_LEIA TK_CARACTER TK_STRING TK_ESCREVA TK_INCLUDE TK_RETORNE TK_CABECALHO TK_TIPO_VAZIO TK_CLASSE TK_COMENTARIO
 
+//%start program
 
 %%
-program: headers main '(' ')' '{' body return '}'
+program: headers main '(' ')' '{' body return '}';
+
+/*headers: header headers
 ;
 
-headers: headers headers
-| TK_INCLUDE {add('h');} 
+header: TK_CABECALHO
+;
+*/
+headers: headers headers 
+| TK_CABECALHO
 ;
 
 main: type TK_IDENTIFICADOR {add('f');}
@@ -50,8 +57,7 @@ body: TK_PARA { add('k'); }  '(' statement ';' condition ';' statement ')' '{' b
 | TK_LEIA { add('k'); } '(' TK_STRING ',' '&' TK_IDENTIFICADOR ')' ';'
 ;
 
-else: TK_SENAO { add('k'); } '{' body '}'
-;
+else: TK_SENAO { add('k'); } '{' body '}' ;
 
 condition: value op value 
 | TK_VERDADEIRO 
@@ -69,6 +75,7 @@ statement: type TK_IDENTIFICADOR { add('v'); }
 | TK_IDENTIFICADOR '=' expr
 | statement '=' expr    
 | TK_IDENTIFICADOR op expr
+|
 ;
 
 op: TK_MAIOR
@@ -84,15 +91,16 @@ type:
 | TK_TIPO_FLOAT
 | TK_TIPO_INTEIRO
 | TK_TIPO_STRING  
-  ;
+|
+;
 
 expr:
-    value        { $$ = $1; }
-| expr '+' expr  { $$ = $1 + $3; }
-| expr '-' expr  { $$ = $1 - $3; }
-| expr '*' expr  { $$ = $1 * $3; }
-| expr '/' expr  { $$ = $1 / $3; }
-| '(' expr ')'   { $$ = $2; }
+    value        //{ $$ = $1; }
+| expr '+' expr  //{ $$ = $1 + $3; }
+| expr '-' expr  //{ $$ = $1 - $3; }
+| expr '*' expr  //{ $$ = $1 * $3; }
+| expr '/' expr  //{ $$ = $1 / $3; }
+| '(' expr ')'   //{ $$ = $2; }
   ;
 
 return: TK_RETORNE { add('k'); } value ';' 
@@ -168,6 +176,9 @@ int search(char *type) {
           symbol_table[count].type=strdup("function");
           count++;
         }
+      }
+      else{
+        printf("");
       }
     }
 void insert_type() {

@@ -1,5 +1,5 @@
 #INCLUDE <stdio.h>
-INT teste(){
-    INT a=0;
+INT main (){
+    INT a;
     RETORNE 0;
 }
