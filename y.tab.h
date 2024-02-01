@@ -54,37 +54,39 @@ extern int yydebug;
     YYEOF = 0,                     /* "end of file"  */
     YYerror = 256,                 /* error  */
     YYUNDEF = 257,                 /* "invalid token"  */
-    TK_TIPO = 258,                 /* TK_TIPO  */
-    TK_IDENTIFICADOR = 259,        /* TK_IDENTIFICADOR  */
-    TK_PONTO_VIRGULA = 260,        /* TK_PONTO_VIRGULA  */
-    TK_TIPO_CHAR = 261,            /* TK_TIPO_CHAR  */
-    TK_TIPO_FLOAT = 262,           /* TK_TIPO_FLOAT  */
-    TK_TIPO_INTEIRO = 263,         /* TK_TIPO_INTEIRO  */
-    TK_TIPO_STRING = 264,          /* TK_TIPO_STRING  */
-    TK_PARA = 265,                 /* TK_PARA  */
-    TK_ENQUANTO = 266,             /* TK_ENQUANTO  */
-    TK_NUMERO = 267,               /* TK_NUMERO  */
-    TK_SE = 268,                   /* TK_SE  */
-    TK_SENAO = 269,                /* TK_SENAO  */
-    TK_MAIOR = 270,                /* TK_MAIOR  */
-    TK_MAIOR_IGUAL = 271,          /* TK_MAIOR_IGUAL  */
-    TK_IGUALDADE = 272,            /* TK_IGUALDADE  */
-    TK_MENOR = 273,                /* TK_MENOR  */
-    TK_MENOR_IGUAL = 274,          /* TK_MENOR_IGUAL  */
-    TK_DIFERENTE = 275,            /* TK_DIFERENTE  */
-    TK_FLOAT = 276,                /* TK_FLOAT  */
-    TK_VERDADEIRO = 277,           /* TK_VERDADEIRO  */
-    TK_FALSO = 278,                /* TK_FALSO  */
-    TK_LEIA = 279,                 /* TK_LEIA  */
-    TK_CARACTER = 280,             /* TK_CARACTER  */
-    TK_STRING = 281,               /* TK_STRING  */
-    TK_ESCREVA = 282,              /* TK_ESCREVA  */
-    TK_INCLUDE = 283,              /* TK_INCLUDE  */
-    TK_RETORNE = 284,              /* TK_RETORNE  */
-    TK_CABECALHO = 285,            /* TK_CABECALHO  */
-    TK_TIPO_VAZIO = 286,           /* TK_TIPO_VAZIO  */
-    TK_CLASSE = 287,               /* TK_CLASSE  */
-    TK_COMENTARIO = 288            /* TK_COMENTARIO  */
+    TK_ID = 258,                   /* TK_ID  */
+    TK_TIPO_CHAR = 259,            /* TK_TIPO_CHAR  */
+    TK_TIPO_FLOAT = 260,           /* TK_TIPO_FLOAT  */
+    TK_TIPO_INT = 261,             /* TK_TIPO_INT  */
+    TK_TIPO_STRING = 262,          /* TK_TIPO_STRING  */
+    TK_PARA = 263,                 /* TK_PARA  */
+    TK_INT = 264,                  /* TK_INT  */
+    TK_SE = 265,                   /* TK_SE  */
+    TK_SENAO = 266,                /* TK_SENAO  */
+    TK_MAIOR = 267,                /* TK_MAIOR  */
+    TK_MAIOR_IGUAL = 268,          /* TK_MAIOR_IGUAL  */
+    TK_MENOR = 269,                /* TK_MENOR  */
+    TK_MENOR_IGUAL = 270,          /* TK_MENOR_IGUAL  */
+    TK_DIFERENTE = 271,            /* TK_DIFERENTE  */
+    TK_FLOAT = 272,                /* TK_FLOAT  */
+    TK_VERDADEIRO = 273,           /* TK_VERDADEIRO  */
+    TK_FALSO = 274,                /* TK_FALSO  */
+    TK_LEIA = 275,                 /* TK_LEIA  */
+    TK_CHAR = 276,                 /* TK_CHAR  */
+    TK_STRING = 277,               /* TK_STRING  */
+    TK_ESCREVA = 278,              /* TK_ESCREVA  */
+    TK_INCLUDE = 279,              /* TK_INCLUDE  */
+    TK_RETORNE = 280,              /* TK_RETORNE  */
+    TK_TIPO_VAZIO = 281,           /* TK_TIPO_VAZIO  */
+    TK_CLASSE = 282,               /* TK_CLASSE  */
+    TK_COMENTARIO = 283,           /* TK_COMENTARIO  */
+    TK_SOMA = 284,                 /* TK_SOMA  */
+    TK_SUBTRACAO = 285,            /* TK_SUBTRACAO  */
+    TK_MULTIPLICACAO = 286,        /* TK_MULTIPLICACAO  */
+    TK_DIVISAO = 287,              /* TK_DIVISAO  */
+    TK_AND = 288,                  /* TK_AND  */
+    TK_OR = 289,                   /* TK_OR  */
+    TK_IGUALDADE = 290             /* TK_IGUALDADE  */
   };
   typedef enum yytokentype yytoken_kind_t;
 #endif
@@ -93,37 +95,39 @@ extern int yydebug;
 #define YYEOF 0
 #define YYerror 256
 #define YYUNDEF 257
-#define TK_TIPO 258
-#define TK_IDENTIFICADOR 259
-#define TK_PONTO_VIRGULA 260
-#define TK_TIPO_CHAR 261
-#define TK_TIPO_FLOAT 262
-#define TK_TIPO_INTEIRO 263
-#define TK_TIPO_STRING 264
-#define TK_PARA 265
-#define TK_ENQUANTO 266
-#define TK_NUMERO 267
-#define TK_SE 268
-#define TK_SENAO 269
-#define TK_MAIOR 270
-#define TK_MAIOR_IGUAL 271
-#define TK_IGUALDADE 272
-#define TK_MENOR 273
-#define TK_MENOR_IGUAL 274
-#define TK_DIFERENTE 275
-#define TK_FLOAT 276
-#define TK_VERDADEIRO 277
-#define TK_FALSO 278
-#define TK_LEIA 279
-#define TK_CARACTER 280
-#define TK_STRING 281
-#define TK_ESCREVA 282
-#define TK_INCLUDE 283
-#define TK_RETORNE 284
-#define TK_CABECALHO 285
-#define TK_TIPO_VAZIO 286
-#define TK_CLASSE 287
-#define TK_COMENTARIO 288
+#define TK_ID 258
+#define TK_TIPO_CHAR 259
+#define TK_TIPO_FLOAT 260
+#define TK_TIPO_INT 261
+#define TK_TIPO_STRING 262
+#define TK_PARA 263
+#define TK_INT 264
+#define TK_SE 265
+#define TK_SENAO 266
+#define TK_MAIOR 267
+#define TK_MAIOR_IGUAL 268
+#define TK_MENOR 269
+#define TK_MENOR_IGUAL 270
+#define TK_DIFERENTE 271
+#define TK_FLOAT 272
+#define TK_VERDADEIRO 273
+#define TK_FALSO 274
+#define TK_LEIA 275
+#define TK_CHAR 276
+#define TK_STRING 277
+#define TK_ESCREVA 278
+#define TK_INCLUDE 279
+#define TK_RETORNE 280
+#define TK_TIPO_VAZIO 281
+#define TK_CLASSE 282
+#define TK_COMENTARIO 283
+#define TK_SOMA 284
+#define TK_SUBTRACAO 285
+#define TK_MULTIPLICACAO 286
+#define TK_DIVISAO 287
+#define TK_AND 288
+#define TK_OR 289
+#define TK_IGUALDADE 290
 
 /* Value type.  */
 #if ! defined YYSTYPE && ! defined YYSTYPE_IS_DECLARED

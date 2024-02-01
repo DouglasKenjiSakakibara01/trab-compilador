@@ -7,6 +7,7 @@
 
 void yyerror(const char *s);
 int yylex();
+//int yywrap();
 void add(char);
 void insert_type();
 int search(char *);
@@ -30,53 +31,79 @@ extern int count_line; // representa a linha do codigo analisada
 %token TK_TIPO TK_IDENTIFICADOR TK_PONTO_VIRGULA TK_TIPO_CHAR TK_TIPO_FLOAT TK_TIPO_INTEIRO TK_TIPO_STRING TK_PARA TK_ENQUANTO TK_NUMERO
 TK_SE TK_SENAO TK_MAIOR TK_MAIOR_IGUAL TK_IGUALDADE TK_MENOR TK_MENOR_IGUAL TK_DIFERENTE TK_FLOAT TK_VERDADEIRO TK_FALSO
 TK_LEIA TK_CARACTER TK_STRING TK_ESCREVA TK_INCLUDE TK_RETORNE TK_CABECALHO TK_TIPO_VAZIO TK_CLASSE TK_COMENTARIO
+TK_SOMA, TK_SUBTRACAO, TK_MULTIPLICACAO, TK_DIVISAO TK_AND TK_OR 
 
-//%start program
+%start prog
 
 %%
+/*
 program: headers main '(' ')' '{' body return '}';
 
-/*headers: header headers
-;
 
-header: TK_CABECALHO
-;
-*/
 headers: headers headers 
 | TK_CABECALHO
 ;
 
-main: type TK_IDENTIFICADOR {add('f');}
+main: type TK_IDENTIFICADOR /*{add('f');}
+;
+*/
+/*
+prog: TK_TIPO TK_IDENTIFICADOR '(' listVar ')' '{' corpoFunc '}'
+    | TK_TIPO_VAZIO TK_IDENTIFICADOR '(' listVar ')' '{' corpoFunc '}' {clear();} prog
+    | '#' TK_INCLUDE biblioteca prog 
+    | {$$ = NULL}
+    ;
+*/
+prog: TK_TIPO TK_IDENTIFICADOR '(' ')' '{' '}'
+    | TK_TIPO TK_IDENTIFICADOR '('  ')' '{' '}' prog
+    | TK_INCLUDE prog 
+    ;
+/*
+biblioteca:'\"' TK_IDENTIFICADOR '\"' 
+          | '\"' TK_IDENTIFICADOR  '.' TK_IDENTIFICADOR '\"'
+          ;
+*/
+chamaVar: TK_IDENTIFICADOR 
+        | TK_IDENTIFICADOR'[' expr ']' 
+   | TK_IDENTIFICADOR '=' expr 
+   | TK_IDENTIFICADOR'[' expr ']' '=' '{' expr '}' 
+        | TK_IDENTIFICADOR',' chamaVar 
+        | TK_IDENTIFICADOR'[' expr ']' ',' chamaVar 
+        | TK_IDENTIFICADOR'=' expr ',' chamaVar 
+   | TK_IDENTIFICADOR'[' expr ']' '=' '{' expr '}' ',' chamaVar 
+   ;
+body: statement ';' 
+|TK_PARA /*{ add('k'); }*/  '(' statement ';' condition ';' statement ')' '{' body '}'
+| TK_SE /*{ add('k'); }*/ '(' condition ')' '{' body '}' else
+//| statement ';' 
+| body // corrigir para n dar o loop
+| TK_ESCREVA /*{ add('k'); }*/ '(' TK_STRING ')' ';'
+| TK_LEIA /*{ add('k'); }*/ '(' TK_STRING ',' '&' TK_IDENTIFICADOR ')' ';'
 ;
 
-body: TK_PARA { add('k'); }  '(' statement ';' condition ';' statement ')' '{' body '}'
-| TK_SE { add('k'); } '(' condition ')' '{' body '}' else
-| statement ';' 
-| body body
-| TK_ESCREVA { add('k'); } '(' TK_STRING ')' ';'
-| TK_LEIA { add('k'); } '(' TK_STRING ',' '&' TK_IDENTIFICADOR ')' ';'
-;
-
-else: TK_SENAO { add('k'); } '{' body '}' ;
+else: TK_SENAO /*{ add('k'); }*/ '{' body '}' ;
 
 condition: value op value 
 | TK_VERDADEIRO 
 | TK_FALSO
 ;
 
-value: TK_NUMERO { add('c');}
-| TK_FLOAT { add('c');}
-| TK_CARACTER { add('c');}
+
+value: TK_NUMERO /*{ add('c');}*/
+| TK_FLOAT /*{ add('c');}*/
+| TK_CARACTER /*{ add('c');}*/
 | TK_IDENTIFICADOR
 ;  
 
-statement: type TK_IDENTIFICADOR { add('v'); } 
-| type TK_IDENTIFICADOR { add('v'); }'=' expr 
+
+statement: type TK_IDENTIFICADOR /*{ add('v'); }*/ 
+| type TK_IDENTIFICADOR /*{ add('v');}*/ '=' expr 
 | TK_IDENTIFICADOR '=' expr
 | statement '=' expr    
 | TK_IDENTIFICADOR op expr
 |
 ;
+
 
 op: TK_MAIOR
 | TK_MAIOR_IGUAL
@@ -101,9 +128,9 @@ expr:
 | expr '*' expr  //{ $$ = $1 * $3; }
 | expr '/' expr  //{ $$ = $1 / $3; }
 | '(' expr ')'   //{ $$ = $2; }
-  ;
+;
 
-return: TK_RETORNE { add('k'); } value ';' 
+return: TK_RETORNE /*{ add('k'); }*/ value ';' 
 ;
 %%
 

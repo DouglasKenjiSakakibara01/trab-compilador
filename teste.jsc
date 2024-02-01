@@ -1,5 +1,7 @@
-#INCLUDE <stdio.h>
-INT main (){
-    INT a;
-    RETORNE 0;
+#INCLUDE <teste.h>
+INT main(){
+    INT a=0;
+    PARA(INT a=0; a<5; a=a+1){
+        INT b=0;
+    }
 }

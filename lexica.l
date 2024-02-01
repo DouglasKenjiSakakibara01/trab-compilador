@@ -12,11 +12,14 @@ int count_line=0;
 %option noyywrap
 %option yylineno
 
-pontuacao "("|")"|"{"|"}"|";"
+/*pontuacao "("|")"|";"|"{"|"}"|"#"*/
+pontuacao "("|")"|";"|"{"|"}"|"#"
+tipo INT|FLOAT|CHAR
+
 %%
 
 [ \t]         ; // ignora espaços em branco e tabulações 
-{pontuacao}   {printf("[%s]: Delimitador\n",yytext);}
+{pontuacao}   {printf("[%s]: Delimitador\n",yytext); yytext[0];}
 [-]?[0-9]+          { printf("[%s]: TK_NUMERO\n",yytext); return TK_NUMERO; }
 [-]?[0-9]+\.[0-9]{1,6}   { printf("[%s]: TK_FLOAT\n",yytext); return TK_FLOAT; }
 ["].*["]        { printf("[%s]: TK_STRING\n",yytext); return TK_STRING; }
@@ -29,9 +32,12 @@ pontuacao "("|")"|"{"|"}"|";"
 ">="           { printf("[%s]: TK_MAIOR_IGUAL\n",yytext); return TK_MAIOR_IGUAL; }
 "<="           { printf("[%s]: TK_MENOR_IGUAL\n",yytext); return TK_MENOR_IGUAL; }
 "!="           { printf("[%s]: TK_DIFERENTE\n",yytext); return TK_DIFERENTE; }
-"INT"          { printf("[%s]: TK_TIPO_INTEIRO\n",yytext); return TK_TIPO_INTEIRO; }
-"FLOAT"        { printf("[%s]: TK_TIPO_FLOAT\n",yytext); return TK_TIPO_FLOAT; }
-"CHAR"         { printf("[%s]: TK_TIPO_CHAR\n",yytext); return TK_TIPO_CHAR; }
+"&&"	       { printf("[%s]: TK_AND\n",yytext); return TK_AND; }
+"||"	       { printf("[%s]: TK_OR\n",yytext); return TK_OR; }
+"+"            { printf("[%s]: TK_SOMA\n",yytext); return TK_SOMA; }
+"-"            { printf("[%s]: TK_SUBTRACAO\n",yytext); return TK_SUBTRACAO; }
+"/"            { printf("[%s]: TK_DIVISAO\n",yytext); return TK_DIVISAO; }
+"*"            { printf("[%s]: TK_MULTIPLICACAO\n",yytext); return TK_MULTIPLICACAO; }
 "STRING"       { printf("[%s]: TK_TIPO_STRING\n",yytext); return TK_TIPO_STRING;}
 "VAZIO"        { printf("[%s]: TK_TIPO_VAZIO\n",yytext); return TK_TIPO_VAZIO; }
 "//"           { printf("[%s]: TK_COMENTARIO\n",yytext); return TK_COMENTARIO; }
@@ -45,8 +51,16 @@ pontuacao "("|")"|"{"|"}"|";"
 "LEIA"        { printf("[%s]: TK_LEIA\n",yytext); return TK_LEIA; }
 "VERDADEIRO"        { printf("[%s]: TK_VERDADEIRO\n",yytext); return TK_VERDADEIRO; }
 "FALSO"        { printf("[%s]: TK_FALSO\n",yytext); return TK_FALSO; }
-^"#INCLUDE"[ ]*<.+\.h>           { printf("[%s]: TK_CABECALHO\n",yytext); return TK_CABECALHO; }
+"#include"        { printf("[%s]: TK_INCLUDE\n",yytext); return TK_INCLUDE; }
+{tipo}        { printf("[%s]: TK_TIPO\n",yytext); return TK_TIPO; }
+
+
 [/n]           {count_line++;}
 
 .              { printf("Erro lexico na linha %d: %s\n", yylineno, yytext);} //qualquer outro caractere que nao esteja definido na gramatica
 %%
+/*
+int yywrap() {
+    return 1;
+}
+*/

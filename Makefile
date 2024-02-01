@@ -1,7 +1,7 @@
 SCANNER := lex
-SCANNER_PARAMS := lexica.l
+SCANNER_PARAMS := lexica_teste.l
 PARSER := yacc
-PARSER_PARAMS := -d sintatica.y
+PARSER_PARAMS := -d sintatica_teste.y
 
 all: compile translate
 
