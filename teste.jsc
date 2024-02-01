@@ -1,7 +1,4 @@
 #INCLUDE <teste.h>
-INT main(){
-    INT a=0;
-    PARA(INT a=0; a<5; a=a+1){
-        INT b=0;
-    }
+CLASSE TESTE{
+    INT var_0=0;
 }

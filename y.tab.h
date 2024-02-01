@@ -86,7 +86,8 @@ extern int yydebug;
     TK_DIVISAO = 287,              /* TK_DIVISAO  */
     TK_AND = 288,                  /* TK_AND  */
     TK_OR = 289,                   /* TK_OR  */
-    TK_IGUALDADE = 290             /* TK_IGUALDADE  */
+    TK_IGUALDADE = 290,            /* TK_IGUALDADE  */
+    TK_NOME_CLASSE = 291           /* TK_NOME_CLASSE  */
   };
   typedef enum yytokentype yytoken_kind_t;
 #endif
@@ -128,6 +129,7 @@ extern int yydebug;
 #define TK_AND 288
 #define TK_OR 289
 #define TK_IGUALDADE 290
+#define TK_NOME_CLASSE 291
 
 /* Value type.  */
 #if ! defined YYSTYPE && ! defined YYSTYPE_IS_DECLARED
