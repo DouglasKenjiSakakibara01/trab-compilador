@@ -2,7 +2,7 @@
     #include <stdio.h>
     #include <stdlib.h>
     #include "y.tab.h"
-    int countn=0;
+    int count_line=1;
 %}
 
 %option yylineno
@@ -32,7 +32,7 @@ digito [0-9]
 [-]?{digito}+\.{digito}{1,6}  { printf("[%s]: TK_FLOAT\n",yytext); return TK_FLOAT; }
 ["].*["]                    { printf("[%s]: TK_STRING\n",yytext); return TK_STRING; }
 ['].[']                     { printf("[%s]: TK_CHAR\n",yytext); return TK_CHAR; }
-{alfabeto_mai}*                        { printf("[%s]: TK_NOME_CLASSE\n",yytext); return TK_NOME_CLASSE; }
+{alfabeto_mai}{alfabeto_min}*                        { printf("[%s]: TK_NOME_CLASSE\n",yytext); return TK_NOME_CLASSE; }
 {alfabeto_min}({alfabeto_min}|{digito}|[_])*   { printf("[%s]: TK_ID\n",yytext); return TK_ID; }
 "<="                        { printf("[%s]: TK_MENOR_IGUAL\n",yytext); return TK_MENOR_IGUAL; }
 ">="                        { printf("[%s]: TK_MAIOR_IGUAL\n",yytext); return TK_MAIOR_IGUAL; }
@@ -49,7 +49,7 @@ digito [0-9]
 \/\/.*                      { ; }
 \/\*(.*\n)*.*\*\/           { ; } 
 [ \t]*                      { ; }
-[\n]                        { countn++; }
+[\n]                        { count_line++; }
 .	                    { return *yytext; } 
 
 

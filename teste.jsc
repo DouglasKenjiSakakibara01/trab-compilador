@@ -1,4 +1,9 @@
 #INCLUDE <teste.h>
-CLASSE TESTE{
-    INT var_0=0;
+CLASSE Exemplo{
+    INT var1;
+    Teste var2= CLASSE Teste();
+    VAZIO funcao(){
+        INT a=0;
+        RETORNE VAZIO;
+    }
 }
