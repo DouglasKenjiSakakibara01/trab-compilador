@@ -11,6 +11,12 @@
     void add(char);
     void insert_type();
     int search(char *);
+    //struct node* add_node(struct node *left, struct node *right, const char *tk);
+    //void print_tree(struct node *tree);
+    
+    void print_tree(struct node *);
+    struct node* add_node(struct node *left, struct node *right, char *tk);
+
 
     struct data {
             int line;
@@ -19,17 +25,18 @@
             char * type;
             
     } symbol_table[40];
-
-    int count=0; // quantidade de estruturas presentes no codigo
-    int query;
-    char type[10];
-    extern int count_line; // representa a linha do codigo analisada 
-    struct node *head; // comeco da arvore
+    
     struct node { 
         struct node *left; 
         struct node *right; 
         char *tk; 
     };
+    int count=0; // quantidade de estruturas presentes no codigo
+    int query;
+    char type[10];
+    extern int count_line; // representa a linha do codigo analisada 
+    struct node *head; // comeco da arvore
+    
 %}
 %union { 
 	struct node_type { 
@@ -40,111 +47,137 @@
 %define parse.error verbose
 %token <node_struct> TK_ID  TK_TIPO_CHAR TK_TIPO_FLOAT TK_TIPO_INT TK_TIPO_STRING TK_PARA TK_INT
 TK_SE TK_SENAO TK_MAIOR TK_MAIOR_IGUAL TK_MENOR TK_MENOR_IGUAL TK_DIFERENTE TK_FLOAT TK_VERDADEIRO TK_FALSO
-TK_LEIA TK_CHAR TK_STRING TK_ESCREVA TK_INCLUDE TK_RETORNE  TK_TIPO_VAZIO TK_CLASSE TK_COMENTARIO
-TK_SOMA, TK_SUBTRACAO, TK_MULTIPLICACAO, TK_DIVISAO TK_AND TK_OR TK_IGUALDADE TK_NOME_CLASSE
-%%
+TK_LEIA TK_CHAR TK_STRING TK_ESCREVA TK_INCLUDE TK_RETORNE  TK_TIPO_VAZIO TK_CLASSE 
+TK_SOMA, TK_SUBTRACAO, TK_MULTIPLICACAO, TK_DIVISAO TK_AND TK_OR  TK_NOME_CLASSE TK_IGUALDADE
 
-program: headers program
-| class program
-|
-;
-
-headers: TK_INCLUDE {add('h');}
-|TK_INCLUDE {add('h');} headers
-;
-
-class: TK_CLASSE TK_NOME_CLASSE {add('s');} '{' class_body '}'
-;
-
-class_body: class_atributes class_body
-|  TK_NOME_CLASSE TK_ID {add('o');}'=' TK_CLASSE TK_NOME_CLASSE '(' ')' ';' class_body 
-|  method '(' parameters ')' '{' body return '}' class_body
-|
-;
-
-class_atributes: statement_atributes ';' 
-;
-
-statement_atributes:  type TK_ID {add('a');}
-| type TK_ID {add('a');}'=' expression // nao esta inserindo as variaveis dentro do metodo na tabela de simbolo
-;
-
-method: type TK_ID {add('m');}
-;
-
-
-parameters: type TK_ID',' parameters
-| type TK_ID 
-|
-;
-
-body: TK_PARA {add('c');} '(' statement ';' condition ';' statement ')' '{' body '}'
-| TK_SE {add('c');} '(' condition ')' '{' body '}' else
-| statement ';'
-| TK_NOME_CLASSE TK_ID {add('o');} '=' TK_CLASSE TK_NOME_CLASSE '(' ')' ';'
-| body body   //tentar tirar essa recursao a esquerda
-| TK_ESCREVA {add('c');} '(' TK_STRING ')' ';'
-| TK_LEIA {add('c');} '(' TK_STRING ',' '&' TK_ID ')' ';'
-;
-
-else: TK_SENAO {add('c');} '{' body '}'
-|
-;
-
-
-statement: type TK_ID {add('v');}
-| type TK_ID  {add('v');} '=' expression 
-| TK_ID '=' expression 
-| TK_ID op expression
-;
-
-
-type: TK_TIPO_INT {insert_type();}
-| TK_TIPO_FLOAT {insert_type();}
-| TK_TIPO_CHAR {insert_type();}
-| TK_TIPO_STRING {insert_type();}
-| TK_TIPO_VAZIO {insert_type();}
-;
-
-
-condition: value op value 
-| TK_VERDADEIRO {add('k');}
-| TK_FALSO {add('k');}
-;
-
-
-expression: expression arithmetic expression
-| '(' expression arithmetic expression ')'
-| value
-| '(' value ')'
-;
-
-arithmetic: TK_SOMA
-| TK_SUBTRACAO 
-| TK_MULTIPLICACAO
-| TK_DIVISAO
-;
-
-op: TK_MAIOR
-| TK_MAIOR_IGUAL
-| TK_MENOR
-| TK_MENOR_IGUAL
-| TK_IGUALDADE
-| TK_DIFERENTE
-;
-
-value: TK_INT {add('c');}
-| TK_FLOAT {add('c');}
-| TK_CHAR {add('c');}
-| TK_ID 
-;
-
-return: TK_RETORNE {add('k');} value ';' 
-|
-;
+%type <node_struct> program headers method class class_atributes class_body parameters 
+return body else statement statement_atributes op condition arithmetic value type expression
 
 %%
 
+program: headers program {$$.nd = add_node($1.nd, $2.nd, "program"); head = $$.nd;}
+| class program {$$.nd = add_node($1.nd, $2.nd, "program"); }
+|{ $$.nd = NULL; };
+;
+
+headers: TK_INCLUDE {add('h');} {$$.nd = add_node(NULL, NULL, "INCLUDE");}
+|TK_INCLUDE {add('h');} headers {$$.nd = add_node($3.nd, NULL, "INCLUDE2");}
+;
+
+class: TK_CLASSE TK_NOME_CLASSE {add('s');} '{' class_body '}'  {$$.nd = add_node($5.nd, NULL, "class");}
+;
+
+class_body: class_atributes class_body {$$.nd = add_node($1.nd, $2.nd, "class_body");}
+|  TK_NOME_CLASSE TK_ID {add('o');}'=' TK_CLASSE TK_NOME_CLASSE '(' ')' ';' class_body {$$.nd = add_node($1.nd, $2.nd, "class_body2");}
+|  method '(' parameters ')' '{' body return '}' class_body{
+   struct node *aux = add_node($6.nd, $7.nd, "class_body3");
+   struct node *aux2 = add_node(&*aux, $9.nd, "class_body3");
+   struct node *aux3 = add_node($1.nd, $3.nd, "class_body3");
+   $$.nd = add_node(&*aux3, &*aux2, "class_body3");
+}
+|  {$$.nd = NULL;}
+;
+
+class_atributes: statement_atributes ';' {$$.nd = add_node($1.nd, NULL, "class_atributes");}
+;
+
+statement_atributes:  type TK_ID {add('a');} {$$.nd = add_node($1.nd, NULL, "statement_atributes");}
+| type TK_ID {add('a');} '=' expression {$$.nd = add_node($1.nd, $5.nd, "statement_atributes");}
+;
+
+method: type TK_ID {add('m');} {$$.nd = add_node($1.nd, NULL, "method");}
+;
+
+
+parameters: type TK_ID',' parameters {$$.nd = add_node($1.nd, $4.nd, "parameters");}
+| type TK_ID {$$.nd = add_node($1.nd, NULL, "parameters");}
+| {$$.nd = NULL;}
+;
+
+//tentar tirar essa recursao a esquerda 
+body: TK_PARA {add('c');} '(' statement ';' condition ';' statement ')' '{' body '}'{
+  struct node *aux = add_node($6.nd, $8.nd, "condition"); 
+  struct node *aux2 = add_node($4.nd, aux, "condition"); 
+  $$.nd = add_node(aux2, $11.nd, "body"); 
+}
+| TK_SE {add('c');} '(' condition ')' '{' body '}' else {
+  struct node *aux = add_node($4.nd, $7.nd, "condition_and_body"); 
+  $$.nd = add_node(aux, $9.nd, "body");
+}
+| statement ';' {$$.nd = add_node($1.nd, NULL, "body_statement");}
+| TK_NOME_CLASSE TK_ID {add('o');} '=' TK_CLASSE TK_NOME_CLASSE '(' ')' ';' {$$.nd = add_node(NULL, NULL, "body_object");}
+| body body  {$$.nd = add_node($1.nd, $2.nd, "body");}
+| TK_ESCREVA {add('c');} '(' TK_STRING ')' ';' {$$.nd = add_node(NULL, NULL, "body_printf");}
+| TK_LEIA {add('c');} '(' TK_STRING ',' '&' TK_ID ')' ';' {$$.nd = add_node(NULL, NULL, "body_scanf");}
+;
+
+else: TK_SENAO {add('c');} '{' body '}' {$$.nd = add_node($4.nd, NULL, "else_body");}
+| {$$.nd = NULL;}
+;
+
+
+statement: type TK_ID {add('v');} {$$.nd = add_node($1.nd, NULL, "statement1");}
+| type TK_ID  {add('v');} '=' expression  {$$.nd = add_node($1.nd, $5.nd, "statement2");}
+| TK_ID '=' expression {$$.nd = add_node($3.nd, NULL, "statement3");}
+| TK_ID op expression {$$.nd = add_node($2.nd, $3.nd, "statement4");}
+;
+
+
+type: TK_TIPO_INT {insert_type();} {$$.nd = add_node(NULL, NULL, "type_int");}
+| TK_TIPO_FLOAT {insert_type();} {$$.nd = add_node(NULL, NULL, "type_float");}
+| TK_TIPO_CHAR {insert_type();} {$$.nd = add_node(NULL, NULL, "type_char");}
+| TK_TIPO_STRING {insert_type();} {$$.nd = add_node(NULL, NULL, "type_string");}
+| TK_TIPO_VAZIO {insert_type();} {$$.nd = add_node(NULL, NULL, "type_void");}
+;
+
+
+condition: value op value  {
+  struct node *aux = add_node($2.nd, $3.nd, "condition_aux"); 
+  $$.nd = add_node($1.nd, aux, "condition");
+}
+| TK_VERDADEIRO {add('k');} {$$.nd = add_node(NULL, NULL, "condition_true");}
+| TK_FALSO {add('k');} {$$.nd = add_node(NULL, NULL, "condition_false");}
+;
+
+//tentar tirar a recursao a esquerda
+expression: expression arithmetic expression {
+  struct node *aux = add_node($2.nd, $3.nd, "expression1_aux"); 
+  $$.nd = add_node($1.nd, aux, "expression1");
+}
+| '(' expression arithmetic expression ')'{
+  struct node *aux = add_node($3.nd, $4.nd, "expression2_aux"); 
+  $$.nd = add_node($2.nd, aux, "expression2");
+}
+| value {$$.nd = add_node($1.nd, NULL, "expresion3");}
+| expression TK_AND expression {add_node($1.nd, $3.nd, "expresion4");}
+| expression TK_OR expression {add_node($1.nd, $3.nd, "expresion5");}
+| '(' value ')' {add_node($2.nd, NULL, "expresion6");}
+;
+
+arithmetic: TK_SOMA {$$.nd = add_node(NULL, NULL, "arithmetic_sum");}
+| TK_SUBTRACAO  {$$.nd = add_node(NULL, NULL, "arithmetic_sub");}
+| TK_MULTIPLICACAO {$$.nd = add_node(NULL, NULL, "arithmetic_mult");}
+| TK_DIVISAO {$$.nd = add_node(NULL, NULL, "arithmetic_div");}
+;
+
+op: TK_MAIOR {$$.nd = add_node(NULL, NULL, "op_>");}
+| TK_MAIOR_IGUAL {$$.nd = add_node(NULL, NULL, "op_>=");}
+| TK_MENOR {$$.nd = add_node(NULL, NULL, "op_<");}
+| TK_MENOR_IGUAL {$$.nd = add_node(NULL, NULL, "op_<=");}
+| TK_DIFERENTE {$$.nd = add_node(NULL, NULL, "op_!=");}
+;
+
+value: TK_INT {add('c');} {$$.nd = add_node(NULL, NULL, "value_int");}
+| TK_FLOAT {add('c');} {$$.nd = add_node(NULL, NULL, "value_float");}
+| TK_CHAR {add('c');} {$$.nd = add_node(NULL, NULL, "value_char");}
+| TK_ID  
+;
+
+return: TK_RETORNE {add('k');} value ';' {$$.nd = add_node($3.nd, NULL, "return");}
+| {$$.nd = NULL;}
+;
+
+%%
 
 
 int main() {
@@ -158,12 +191,22 @@ int main() {
       free(symbol_table[i].type);
     }
     printf("\n\n");
-
-	printf("-*-*-*-*-*-* Arvore sintatica -*-*-*-*-**-*-*--*-\n\n");
-	printtree(head); 
-	printf("\n\n");
+    printf("-*-*-*-*-*-* Arvore sintatica -*-*-*-*-**-*-*--*-\n\n");
+    print_tree(head);
+    printf("\n\n");
+    
   }
-    /*
+int search(char *type) {
+	int i;
+	for(i=count-1; i>=0; i--) {
+		if(strcmp(symbol_table[i].name, type)==0) {
+			return -1;
+			break;
+		}
+	}
+	return 0;
+} 
+ /*
     h - headers
     k - keywords
     v - variables
@@ -173,8 +216,8 @@ int main() {
     a - attribute
     p - parameters
     o - objects
-    */
-    void add(char c) {
+*/
+void add(char c) {
       query=search(yytext);
       if(!query) {
         if(c == 'h') {
@@ -246,36 +289,33 @@ int main() {
         printf("");
       }
     }
+    
 void insert_type() {
       strcpy(type, yytext);
 }
+
+
 struct node* add_node(struct node *left, struct node *right, char *tk) {	
 	struct node *newnode = (struct node *)malloc(sizeof(struct node));
-	char *newstr = (char *)malloc(strlen(token)+1);
-	strcpy(newstr, token);
+	char *newstr = (char *)malloc(strlen(tk)+1);
+	strcpy(newstr, tk);
 	newnode->left = left;
 	newnode->right = right;
 	newnode->tk = newstr;
 	return(newnode);
 }
-/*
-void printtree(struct node* tree) {
-	printf("\n\n Inorder traversal of the Parse Tree: \n\n");
-	printInorder(tree);
-	printf("\n\n");
-}
-*/
 
 void print_tree(struct node *tree) {
 	int i;
 	if (tree->left) {
 		print_tree(tree->left);
 	}
-	printf("%s, ", tree->token);
+	printf("%s, ", tree->tk);
 	if (tree->right) {
 		print_tree(tree->right);
 	}
 }
+
 
 void yyerror(const char* msg) {
         fprintf(stderr, "%s\n", msg);

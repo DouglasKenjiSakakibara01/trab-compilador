@@ -79,15 +79,14 @@ extern int yydebug;
     TK_RETORNE = 280,              /* TK_RETORNE  */
     TK_TIPO_VAZIO = 281,           /* TK_TIPO_VAZIO  */
     TK_CLASSE = 282,               /* TK_CLASSE  */
-    TK_COMENTARIO = 283,           /* TK_COMENTARIO  */
-    TK_SOMA = 284,                 /* TK_SOMA  */
-    TK_SUBTRACAO = 285,            /* TK_SUBTRACAO  */
-    TK_MULTIPLICACAO = 286,        /* TK_MULTIPLICACAO  */
-    TK_DIVISAO = 287,              /* TK_DIVISAO  */
-    TK_AND = 288,                  /* TK_AND  */
-    TK_OR = 289,                   /* TK_OR  */
-    TK_IGUALDADE = 290,            /* TK_IGUALDADE  */
-    TK_NOME_CLASSE = 291           /* TK_NOME_CLASSE  */
+    TK_SOMA = 283,                 /* TK_SOMA  */
+    TK_SUBTRACAO = 284,            /* TK_SUBTRACAO  */
+    TK_MULTIPLICACAO = 285,        /* TK_MULTIPLICACAO  */
+    TK_DIVISAO = 286,              /* TK_DIVISAO  */
+    TK_AND = 287,                  /* TK_AND  */
+    TK_OR = 288,                   /* TK_OR  */
+    TK_NOME_CLASSE = 289,          /* TK_NOME_CLASSE  */
+    TK_IGUALDADE = 290             /* TK_IGUALDADE  */
   };
   typedef enum yytokentype yytoken_kind_t;
 #endif
@@ -121,19 +120,30 @@ extern int yydebug;
 #define TK_RETORNE 280
 #define TK_TIPO_VAZIO 281
 #define TK_CLASSE 282
-#define TK_COMENTARIO 283
-#define TK_SOMA 284
-#define TK_SUBTRACAO 285
-#define TK_MULTIPLICACAO 286
-#define TK_DIVISAO 287
-#define TK_AND 288
-#define TK_OR 289
+#define TK_SOMA 283
+#define TK_SUBTRACAO 284
+#define TK_MULTIPLICACAO 285
+#define TK_DIVISAO 286
+#define TK_AND 287
+#define TK_OR 288
+#define TK_NOME_CLASSE 289
 #define TK_IGUALDADE 290
-#define TK_NOME_CLASSE 291
 
 /* Value type.  */
 #if ! defined YYSTYPE && ! defined YYSTYPE_IS_DECLARED
-typedef int YYSTYPE;
+union YYSTYPE
+{
+#line 41 "sintatica_teste.y"
+ 
+	struct node_type { 
+		char name[100]; 
+		struct node* nd;
+	} node_struct; 
+
+#line 144 "y.tab.h"
+
+};
+typedef union YYSTYPE YYSTYPE;
 # define YYSTYPE_IS_TRIVIAL 1
 # define YYSTYPE_IS_DECLARED 1
 #endif

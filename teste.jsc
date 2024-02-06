@@ -4,6 +4,6 @@ CLASSE Exemplo{
     Teste var2= CLASSE Teste();
     VAZIO funcao(){
         INT a=0;
-        RETORNE VAZIO;
+        RETORNE 0;
     }
 }
