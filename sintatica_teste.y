@@ -67,13 +67,13 @@ headers: TK_INCLUDE {add('h');} {$$.nd = add_node(NULL, NULL, "INCLUDE");}
 class: TK_CLASSE TK_NOME_CLASSE {add('s');} '{' class_body '}'  {$$.nd = add_node($5.nd, NULL, "class");}
 ;
 
-class_body: class_atributes class_body {$$.nd = add_node($1.nd, $2.nd, "class_body");}
-|  TK_NOME_CLASSE TK_ID {add('o');}'=' TK_CLASSE TK_NOME_CLASSE '(' ')' ';' class_body {$$.nd = add_node($1.nd, $2.nd, "class_body2");}
+class_body: class_atributes class_body {$$.nd = add_node($1.nd, $2.nd, "class_body_atributes");}
+|  TK_NOME_CLASSE TK_ID {add('o');}'=' TK_CLASSE TK_NOME_CLASSE '(' ')' ';' class_body {$$.nd = add_node($1.nd, $2.nd, "class_body_object");}
 |  method '(' parameters ')' '{' body return '}' class_body{
-   struct node *aux = add_node($6.nd, $7.nd, "class_body3");
-   struct node *aux2 = add_node(&*aux, $9.nd, "class_body3");
-   struct node *aux3 = add_node($1.nd, $3.nd, "class_body3");
-   $$.nd = add_node(&*aux3, &*aux2, "class_body3");
+   struct node *aux = add_node($6.nd, $7.nd, "class_body_method_aux");
+   struct node *aux2 = add_node(&*aux, $9.nd, "class_body_method_aux2");
+   struct node *aux3 = add_node($1.nd, $3.nd, "class_body_method_aux3");
+   $$.nd = add_node(aux3, aux2, "class_body_method");
 }
 |  {$$.nd = NULL;}
 ;
@@ -81,8 +81,8 @@ class_body: class_atributes class_body {$$.nd = add_node($1.nd, $2.nd, "class_bo
 class_atributes: statement_atributes ';' {$$.nd = add_node($1.nd, NULL, "class_atributes");}
 ;
 
-statement_atributes:  type TK_ID {add('a');} {$$.nd = add_node($1.nd, NULL, "statement_atributes");}
-| type TK_ID {add('a');} '=' expression {$$.nd = add_node($1.nd, $5.nd, "statement_atributes");}
+statement_atributes:  type TK_ID {add('a');} '=' expression {$$.nd = add_node($1.nd, $5.nd, "statement_atributes2");}
+| type TK_ID {add('a');} {$$.nd = add_node($1.nd, NULL, "statement_atributes2");}
 ;
 
 method: type TK_ID {add('m');} {$$.nd = add_node($1.nd, NULL, "method");}
@@ -90,28 +90,32 @@ method: type TK_ID {add('m');} {$$.nd = add_node($1.nd, NULL, "method");}
 
 
 parameters: type TK_ID',' parameters {$$.nd = add_node($1.nd, $4.nd, "parameters");}
-| type TK_ID {$$.nd = add_node($1.nd, NULL, "parameters");}
+| type TK_ID {$$.nd = add_node($1.nd, NULL, "parameters2");}
 | {$$.nd = NULL;}
 ;
 
 //tentar tirar essa recursao a esquerda 
-body: TK_PARA {add('c');} '(' statement ';' condition ';' statement ')' '{' body '}'{
-  struct node *aux = add_node($6.nd, $8.nd, "condition"); 
-  struct node *aux2 = add_node($4.nd, aux, "condition"); 
-  $$.nd = add_node(aux2, $11.nd, "body"); 
+body: TK_PARA {add('k');} '(' statement ';' condition ';' statement ')' '{' body '}'{
+  struct node *aux = add_node($6.nd, $8.nd, "body_for_aux"); 
+  struct node *aux2 = add_node($4.nd, aux, "body_for_aux2"); 
+  $$.nd = add_node(aux2, $11.nd, "body_for"); 
 }
-| TK_SE {add('c');} '(' condition ')' '{' body '}' else {
-  struct node *aux = add_node($4.nd, $7.nd, "condition_and_body"); 
-  $$.nd = add_node(aux, $9.nd, "body");
+/*
+| TK_SE {add('k');} '(' condition ')' '{' body '}' else {
+  struct node *aux = add_node($4.nd, $7.nd, "body_if_aux"); 
+  $$.nd = add_node(aux, $9.nd, "body_if");
 }
+*/
+| TK_SE {add('k');} '(' condition ')' '{' body '}' {$$.nd = add_node($4.nd, $7.nd, "body_if");}
+| else {  $$.nd = add_node($1.nd, NULL, "body_if");} 
 | statement ';' {$$.nd = add_node($1.nd, NULL, "body_statement");}
 | TK_NOME_CLASSE TK_ID {add('o');} '=' TK_CLASSE TK_NOME_CLASSE '(' ')' ';' {$$.nd = add_node(NULL, NULL, "body_object");}
 | body body  {$$.nd = add_node($1.nd, $2.nd, "body");}
-| TK_ESCREVA {add('c');} '(' TK_STRING ')' ';' {$$.nd = add_node(NULL, NULL, "body_printf");}
-| TK_LEIA {add('c');} '(' TK_STRING ',' '&' TK_ID ')' ';' {$$.nd = add_node(NULL, NULL, "body_scanf");}
+| TK_ESCREVA {add('k');} '(' TK_STRING ')' ';' {$$.nd = add_node(NULL, NULL, "body_printf");}
+| TK_LEIA {add('k');} '(' TK_STRING ',' '&' TK_ID ')' ';' {$$.nd = add_node(NULL, NULL, "body_scanf");}
 ;
 
-else: TK_SENAO {add('c');} '{' body '}' {$$.nd = add_node($4.nd, NULL, "else_body");}
+else: TK_SENAO {add('k');} '{' body '}' {$$.nd = add_node($4.nd, NULL, "else_body");}
 | {$$.nd = NULL;}
 ;
 
@@ -137,6 +141,7 @@ condition: value op value  {
 }
 | TK_VERDADEIRO {add('k');} {$$.nd = add_node(NULL, NULL, "condition_true");}
 | TK_FALSO {add('k');} {$$.nd = add_node(NULL, NULL, "condition_false");}
+| expression TK_IGUALDADE expression {$$.nd = add_node($1.nd, $3.nd, "condition_equal");}
 ;
 
 //tentar tirar a recursao a esquerda
@@ -221,42 +226,42 @@ void add(char c) {
       query=search(yytext);
       if(!query) {
         if(c == 'h') {
-          symbol_table[count].name=strdup(yytext);
+          symbol_table[count].name=strdup(yylval.node_struct.name);
           symbol_table[count].data_type=strdup(type);
           symbol_table[count].line=count_line;
           symbol_table[count].type=strdup("header");
           count++;
         }
         else if(c == 'k') {
-          symbol_table[count].name=strdup(yytext);
+          symbol_table[count].name=strdup(yylval.node_struct.name);
           symbol_table[count].data_type=strdup("N/A");
           symbol_table[count].line=count_line;
           symbol_table[count].type=strdup("keyword\t");
           count++;
         }
         else if(c == 'v') {
-          symbol_table[count].name=strdup(yytext);
+          symbol_table[count].name=strdup(yylval.node_struct.name);
           symbol_table[count].data_type=strdup(type);
           symbol_table[count].line=count_line;
           symbol_table[count].type=strdup("variable");
           count++;
         }
         else if(c == 'c') {
-          symbol_table[count].name=strdup(yytext);
+          symbol_table[count].name=strdup(yylval.node_struct.name);
           symbol_table[count].data_type=strdup("CONST");
           symbol_table[count].line=count_line;
           symbol_table[count].type=strdup("constant");
           count++;
         }
         else if(c == 'm') {
-          symbol_table[count].name=strdup(yytext);
+          symbol_table[count].name=strdup(yylval.node_struct.name);
           symbol_table[count].data_type=strdup(type);
           symbol_table[count].line=count_line;
           symbol_table[count].type=strdup("method");
           count++;
         }
         else if(c == 's') {
-          symbol_table[count].name=strdup(yytext);
+          symbol_table[count].name=strdup(yylval.node_struct.name);
           symbol_table[count].data_type=strdup(type);
           symbol_table[count].line=count_line;
           symbol_table[count].type=strdup("class");
@@ -264,21 +269,21 @@ void add(char c) {
         }
 
         else if(c == 'a') {
-          symbol_table[count].name=strdup(yytext);
+          symbol_table[count].name=strdup(yylval.node_struct.name);
           symbol_table[count].data_type=strdup(type);
           symbol_table[count].line=count_line;
           symbol_table[count].type=strdup("attribute");
           count++;
         }
         else if(c == 'p') {
-          symbol_table[count].name=strdup(yytext);
+          symbol_table[count].name=strdup(yylval.node_struct.name);
           symbol_table[count].data_type=strdup(type);
           symbol_table[count].line=count_line;
           symbol_table[count].type=strdup("parameter");
           count++;
         }
         else if(c == 'o') {
-          symbol_table[count].name=strdup(yytext);
+          symbol_table[count].name=strdup(yylval.node_struct.name);
           symbol_table[count].data_type=strdup(type);
           symbol_table[count].line=count_line;
           symbol_table[count].type=strdup("object");
@@ -291,7 +296,8 @@ void add(char c) {
     }
     
 void insert_type() {
-      strcpy(type, yytext);
+      //strcpy(type, yytext);
+      strcpy(type, yylval.node_struct.name);
 }
 
 
@@ -304,7 +310,7 @@ struct node* add_node(struct node *left, struct node *right, char *tk) {
 	newnode->tk = newstr;
 	return(newnode);
 }
-
+// percorre a arvore usando a forma in-ordem
 void print_tree(struct node *tree) {
 	int i;
 	if (tree->left) {

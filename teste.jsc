@@ -1,9 +1,29 @@
 #INCLUDE <teste.h>
+#INCLUDE <teste2.h>
 CLASSE Exemplo{
     INT var1;
-    Teste var2= CLASSE Teste();
+    INT var2;
+    Teste var3= CLASSE Teste();
     VAZIO funcao(){
-        INT a=0;
+        INT t;
+        FLOAT v = 2.0;
+        FLOAT v2 = 3.0;
+        INT a = 0;
+        INT b = 0;
+
+        PARA(a=0; a>20; a=a+1){
+            ESCREVA("teste for");
+        }
+        SE(t==0){
+            ESCREVA("teste if");
+        }
+        SENAO{
+            ESCREVA("teste else");
+            LEIA("",&t);
+
+        } 
+        
         RETORNE 0;
     }
 }
+
