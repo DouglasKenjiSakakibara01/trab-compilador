@@ -133,14 +133,21 @@ extern int yydebug;
 #if ! defined YYSTYPE && ! defined YYSTYPE_IS_DECLARED
 union YYSTYPE
 {
-#line 41 "sintatica_teste.y"
+#line 48 "sintatica_testeSemantica.y"
  
 	struct node_type { 
 		char name[100]; 
 		struct node* nd;
 	} node_struct; 
 
-#line 144 "y.tab.h"
+  struct node_type2 { 
+		char name[100]; 
+		struct node* nd;
+    char type[5];
+	} node_struct2; 
+
+
+#line 151 "y.tab.h"
 
 };
 typedef union YYSTYPE YYSTYPE;

@@ -11,9 +11,6 @@
     void add(char);
     void insert_type();
     int search(char *);
-    //struct node* add_node(struct node *left, struct node *right, const char *tk);
-    //void print_tree(struct node *tree);
-    
     void print_tree(struct node *);
     struct node* add_node(struct node *left, struct node *right, char *tk);
 
@@ -36,6 +33,8 @@
     char type[10];
     extern int count_line; // representa a linha do codigo analisada 
     struct node *head; // comeco da arvore
+    
+
     
 %}
 %union { 
@@ -184,7 +183,7 @@ return: TK_RETORNE {add('k');} value ';' {$$.nd = add_node($3.nd, NULL, "return"
 
 %%
 
-
+// falta tratar para rodar com mais de um arquivo 
 int main() {
     yyparse();
     printf("-*-*-*-*-*-* Tabela de simbolos -*-*-*-*-**-*-*--*-\n");
@@ -201,10 +200,11 @@ int main() {
     printf("\n\n");
     
   }
-int search(char *type) {
+
+int search(char *name) {
 	int i;
 	for(i=count-1; i>=0; i--) {
-		if(strcmp(symbol_table[i].name, type)==0) {
+		if(strcmp(symbol_table[i].name, name)==0) {
 			return -1;
 			break;
 		}
@@ -290,9 +290,7 @@ void add(char c) {
           count++;
         }
       }
-      else{
-        printf("");
-      }
+      
     }
     
 void insert_type() {

@@ -561,8 +561,8 @@ int yy_flex_debug = 0;
 #define YY_MORE_ADJ 0
 #define YY_RESTORE_YY_MORE_OFFSET
 char *yytext;
-#line 1 "lexica_teste.l"
-#line 2 "lexica_teste.l"
+#line 1 "lexica.l"
+#line 2 "lexica.l"
     #include <stdio.h>
     #include <stdlib.h>
     #include "y.tab.h"
@@ -788,7 +788,7 @@ YY_DECL
 		}
 
 	{
-#line 14 "lexica_teste.l"
+#line 14 "lexica.l"
 
 
 #line 795 "lex.yy.c"
@@ -861,199 +861,199 @@ do_action:	/* This label is used only to access EOF actions. */
 
 case 1:
 YY_RULE_SETUP
-#line 16 "lexica_teste.l"
+#line 16 "lexica.l"
 { strcpy(yylval.node_struct.name,(yytext));printf("[%s]: TK_TIPO_INT\n",yytext); return TK_TIPO_INT; }
 	YY_BREAK
 case 2:
 YY_RULE_SETUP
-#line 17 "lexica_teste.l"
+#line 17 "lexica.l"
 {strcpy(yylval.node_struct.name,(yytext));  printf("[%s]: TK_TIPO_FLOAT\n",yytext); return TK_TIPO_FLOAT; }
 	YY_BREAK
 case 3:
 YY_RULE_SETUP
-#line 18 "lexica_teste.l"
+#line 18 "lexica.l"
 { strcpy(yylval.node_struct.name,(yytext)); printf("[%s]: TK_TIPO_CHAR\n",yytext) ; return TK_TIPO_CHAR; }
 	YY_BREAK
 case 4:
 YY_RULE_SETUP
-#line 19 "lexica_teste.l"
+#line 19 "lexica.l"
 { strcpy(yylval.node_struct.name,(yytext)); printf("[%s]: TK_TIPO_VAZIO\n",yytext); return TK_TIPO_VAZIO; }
 	YY_BREAK
 case 5:
 YY_RULE_SETUP
-#line 20 "lexica_teste.l"
+#line 20 "lexica.l"
 { strcpy(yylval.node_struct.name,(yytext)); printf("[%s]: TK_TIPO_STRING\n",yytext); return TK_TIPO_STRING; }
 	YY_BREAK
 case 6:
 YY_RULE_SETUP
-#line 21 "lexica_teste.l"
+#line 21 "lexica.l"
 { strcpy(yylval.node_struct.name,(yytext)); printf("[%s]: TK_CLASSE\n",yytext); return TK_CLASSE; }
 	YY_BREAK
 case 7:
 YY_RULE_SETUP
-#line 22 "lexica_teste.l"
+#line 22 "lexica.l"
 { strcpy(yylval.node_struct.name,(yytext)); printf("[%s]: TK_ESCREVA\n",yytext); return TK_ESCREVA; }
 	YY_BREAK
 case 8:
 YY_RULE_SETUP
-#line 23 "lexica_teste.l"
+#line 23 "lexica.l"
 { strcpy(yylval.node_struct.name,(yytext)); printf("[%s]: TK_LEIA\n",yytext); return TK_LEIA; }
 	YY_BREAK
 case 9:
 YY_RULE_SETUP
-#line 24 "lexica_teste.l"
+#line 24 "lexica.l"
 { strcpy(yylval.node_struct.name,(yytext)); printf("[%s]: TK_RETORNE\n",yytext); return TK_RETORNE; }
 	YY_BREAK
 case 10:
 YY_RULE_SETUP
-#line 25 "lexica_teste.l"
+#line 25 "lexica.l"
 { strcpy(yylval.node_struct.name,(yytext)); printf("[%s]: TK_PARA\n",yytext); return TK_PARA; }
 	YY_BREAK
 case 11:
 YY_RULE_SETUP
-#line 26 "lexica_teste.l"
+#line 26 "lexica.l"
 { strcpy(yylval.node_struct.name,(yytext)); printf("[%s]: TK_SE\n",yytext); return TK_SE; }
 	YY_BREAK
 case 12:
 YY_RULE_SETUP
-#line 27 "lexica_teste.l"
+#line 27 "lexica.l"
 { strcpy(yylval.node_struct.name,(yytext)); printf("[%s]: TK_TIPO_SENAO\n",yytext); return TK_SENAO; }
 	YY_BREAK
 case 13:
 YY_RULE_SETUP
-#line 28 "lexica_teste.l"
+#line 28 "lexica.l"
 { strcpy(yylval.node_struct.name,(yytext)); printf("[%s]: TK_TIPO_INCLUDE\n",yytext); return TK_INCLUDE; }
 	YY_BREAK
 case 14:
 YY_RULE_SETUP
-#line 29 "lexica_teste.l"
+#line 29 "lexica.l"
 { strcpy(yylval.node_struct.name,(yytext)); printf("[%s]: TK_VERDADEIRO\n",yytext); return TK_VERDADEIRO; }
 	YY_BREAK
 case 15:
 YY_RULE_SETUP
-#line 30 "lexica_teste.l"
+#line 30 "lexica.l"
 { strcpy(yylval.node_struct.name,(yytext)); printf("[%s]: TK_ESCREVA\n",yytext); return TK_FALSO; }
 	YY_BREAK
 case 16:
 YY_RULE_SETUP
-#line 31 "lexica_teste.l"
+#line 31 "lexica.l"
 { strcpy(yylval.node_struct.name,(yytext)); printf("[%s]: TK_INT\n",yytext); return TK_INT; }
 	YY_BREAK
 case 17:
 YY_RULE_SETUP
-#line 32 "lexica_teste.l"
+#line 32 "lexica.l"
 { strcpy(yylval.node_struct.name,(yytext)); printf("[%s]: TK_FLOAT\n",yytext); return TK_FLOAT; }
 	YY_BREAK
 case 18:
 YY_RULE_SETUP
-#line 33 "lexica_teste.l"
+#line 33 "lexica.l"
 { strcpy(yylval.node_struct.name,(yytext)); printf("[%s]: TK_STRING\n",yytext); return TK_STRING; }
 	YY_BREAK
 case 19:
 YY_RULE_SETUP
-#line 34 "lexica_teste.l"
+#line 34 "lexica.l"
 { strcpy(yylval.node_struct.name,(yytext)); printf("[%s]: TK_CHAR\n",yytext); return TK_CHAR; }
 	YY_BREAK
 case 20:
 YY_RULE_SETUP
-#line 35 "lexica_teste.l"
+#line 35 "lexica.l"
 { strcpy(yylval.node_struct.name,(yytext)); printf("[%s]: TK_NOME_CLASSE\n",yytext); return TK_NOME_CLASSE; }
 	YY_BREAK
 case 21:
 YY_RULE_SETUP
-#line 36 "lexica_teste.l"
+#line 36 "lexica.l"
 { strcpy(yylval.node_struct.name,(yytext)); printf("[%s]: TK_ID\n",yytext); return TK_ID; }
 	YY_BREAK
 case 22:
 YY_RULE_SETUP
-#line 37 "lexica_teste.l"
+#line 37 "lexica.l"
 { strcpy(yylval.node_struct.name,(yytext)); printf("[%s]: TK_MENOR_IGUAL\n",yytext); return TK_MENOR_IGUAL; }
 	YY_BREAK
 case 23:
 YY_RULE_SETUP
-#line 38 "lexica_teste.l"
+#line 38 "lexica.l"
 { strcpy(yylval.node_struct.name,(yytext)); printf("[%s]: TK_MAIOR_IGUAL\n",yytext); return TK_MAIOR_IGUAL; }
 	YY_BREAK
 case 24:
 YY_RULE_SETUP
-#line 39 "lexica_teste.l"
+#line 39 "lexica.l"
 { strcpy(yylval.node_struct.name,(yytext)); printf("[%s]: TK_IGUALDADE\n",yytext); return TK_IGUALDADE; }
 	YY_BREAK
 case 25:
 YY_RULE_SETUP
-#line 40 "lexica_teste.l"
+#line 40 "lexica.l"
 { strcpy(yylval.node_struct.name,(yytext)); printf("[%s]: TK_DIFERENTE\n",yytext); return TK_DIFERENTE; }
 	YY_BREAK
 case 26:
 YY_RULE_SETUP
-#line 41 "lexica_teste.l"
+#line 41 "lexica.l"
 { strcpy(yylval.node_struct.name,(yytext)); printf("[%s]: TK_MAIOR\n",yytext); return TK_MAIOR; }
 	YY_BREAK
 case 27:
 YY_RULE_SETUP
-#line 42 "lexica_teste.l"
+#line 42 "lexica.l"
 { strcpy(yylval.node_struct.name,(yytext)); printf("[%s]: TK_MENOR\n",yytext); return TK_MENOR; }
 	YY_BREAK
 case 28:
 YY_RULE_SETUP
-#line 43 "lexica_teste.l"
+#line 43 "lexica.l"
 { strcpy(yylval.node_struct.name,(yytext)); printf("[%s]: TK_AND\n",yytext); return TK_AND; }
 	YY_BREAK
 case 29:
 YY_RULE_SETUP
-#line 44 "lexica_teste.l"
+#line 44 "lexica.l"
 { strcpy(yylval.node_struct.name,(yytext)); printf("[%s]: TK_OR\n",yytext); return TK_OR; }
 	YY_BREAK
 case 30:
 YY_RULE_SETUP
-#line 45 "lexica_teste.l"
+#line 45 "lexica.l"
 { strcpy(yylval.node_struct.name,(yytext)); printf("[%s]: TK_SOMA\n",yytext); return TK_SOMA; }
 	YY_BREAK
 case 31:
 YY_RULE_SETUP
-#line 46 "lexica_teste.l"
+#line 46 "lexica.l"
 { strcpy(yylval.node_struct.name,(yytext)); printf("[%s]: TK_SUBTRACAO\n",yytext); return TK_SUBTRACAO; }
 	YY_BREAK
 case 32:
 YY_RULE_SETUP
-#line 47 "lexica_teste.l"
+#line 47 "lexica.l"
 { strcpy(yylval.node_struct.name,(yytext)); printf("[%s]: TK_DIVISAO\n",yytext); return TK_DIVISAO; }
 	YY_BREAK
 case 33:
 YY_RULE_SETUP
-#line 48 "lexica_teste.l"
+#line 48 "lexica.l"
 { strcpy(yylval.node_struct.name,(yytext)); printf("[%s]: TK_MULTIPLICACAO\n",yytext); return TK_MULTIPLICACAO; }
 	YY_BREAK
 case 34:
 YY_RULE_SETUP
-#line 49 "lexica_teste.l"
+#line 49 "lexica.l"
 { ; }
 	YY_BREAK
 case 35:
 /* rule 35 can match eol */
 YY_RULE_SETUP
-#line 50 "lexica_teste.l"
+#line 50 "lexica.l"
 { ; } 
 	YY_BREAK
 case 36:
 YY_RULE_SETUP
-#line 51 "lexica_teste.l"
+#line 51 "lexica.l"
 { ; }
 	YY_BREAK
 case 37:
 /* rule 37 can match eol */
 YY_RULE_SETUP
-#line 52 "lexica_teste.l"
+#line 52 "lexica.l"
 { count_line++; }
 	YY_BREAK
 case 38:
 YY_RULE_SETUP
-#line 53 "lexica_teste.l"
+#line 53 "lexica.l"
 { return *yytext; } 
 	YY_BREAK
 case 39:
 YY_RULE_SETUP
-#line 56 "lexica_teste.l"
+#line 56 "lexica.l"
 ECHO;
 	YY_BREAK
 #line 1060 "lex.yy.c"
@@ -2075,7 +2075,7 @@ void yyfree (void * ptr )
 
 #define YYTABLES_NAME "yytables"
 
-#line 56 "lexica_teste.l"
+#line 56 "lexica.l"
 
 /*
 int yywrap() {
