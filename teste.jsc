@@ -9,7 +9,8 @@ CLASSE Exemplo{
         FLOAT v = 2.0;
         FLOAT v2 = 3.0;
         INT a = 0;
-        INT b = 0;
+        INT a = 1; //ja foi declarada
+        b=0; // nao foi declarada
 
         PARA(a=0; a>20; a=a+1){
             ESCREVA("teste for");
