@@ -43,7 +43,7 @@
     char errors[50][100];
     int ic_idx=0;
     char icg[50][100];
-
+    char *function_return;
     
 %}
 %union { 
@@ -72,8 +72,10 @@ return body else statement statement_atributes op condition arithmetic type
 
 %%
 
-program: headers program {$$.nd = add_node($1.nd, $2.nd, "program"); head = $$.nd;}
-| class program {$$.nd = add_node($1.nd, $2.nd, "program"); }
+program: headers program {$$.nd = add_node($1.nd, $2.nd, "program_header"); head = $$.nd;}
+//| class program {$$.nd = add_node($1.nd, $2.nd, "program"); }
+| class {$$.nd = add_node($1.nd, NULL, "program"); head = $$.nd;}
+
 |{ $$.nd = NULL; };
 ;
 
@@ -138,32 +140,41 @@ else: TK_SENAO {add('k');} '{' body '}' {$$.nd = add_node($4.nd, NULL, "else_bod
 
 
 statement: type TK_ID {add('v');} {$$.nd = add_node($1.nd, NULL, "statement1");}
-| type TK_ID  {add('v');} '=' expression  /*{ 
+| type TK_ID  {add('v');} '=' expression  { 
 	$2.nd = add_node(NULL, NULL, $2.name); 
 	int t = check_type($1.name, $5.type); 
+  char *id_type = get_type($1.name);
   if (t==0){
       $$.nd = add_node($2.nd, $5.nd, "statement2"); 
+  }
+  else{
+      sprintf(errors[count_errors], "Linha %d: a variavel %s recebe um valor de tipo diferente\n", $2.name,  count_line);
   }    
-  sprintf(icg[ic_idx++], "%s = %s\n", $2.name, $5.name);
-}*/
-| TK_ID { check_declaration($1.name); } '=' expression /*{
+}
+| TK_ID { check_declaration($1.name); } '=' expression {
 	$1.nd = add_node(NULL, NULL, $1.name); 
 	char *id_type = get_type($1.name); 
 	//int t = check_type(id_type, $4.type); 
-  if(!strcmp(id_type, $4.type)){
-	  $$.nd = add_node($1.nd, $4.nd, "statement3"); 
-    sprintf(icg[ic_idx++], "%s = %s\n", $1.name, $4.name);
+  if(id_type!=NULL){
+    if(!strcmp(id_type, $4.type)){
+	    $$.nd = add_node($1.nd, $4.nd, "statement3"); 
+      sprintf(icg[ic_idx++], "%s = %s\n", $1.name, $4.name);
+    }   
+    else{
+      sprintf(errors[count_errors], "Linha %d: a variavel %s recebe um valor de tipo diferente\n",$1.name,  count_line+1);
+
+    }  
   }
-}*/
-| TK_ID { check_declaration($1.name); } op expression //{$1.nd = add_node(NULL, NULL, $1.name); $$.nd = add_node($1.nd, $4.nd, "statement4");}
+  } 
+| TK_ID { check_declaration($1.name); } op expression {$1.nd = add_node(NULL, NULL, $1.name); $$.nd = add_node($1.nd, $4.nd, $3.name);}
 ;
 
 
-type: TK_TIPO_INT {insert_type();} {$$.nd = add_node(NULL, NULL, "type_int");}
-| TK_TIPO_FLOAT {insert_type();} {$$.nd = add_node(NULL, NULL, "type_float");}
-| TK_TIPO_CHAR {insert_type();} {$$.nd = add_node(NULL, NULL, "type_char");}
-| TK_TIPO_STRING {insert_type();} {$$.nd = add_node(NULL, NULL, "type_string");}
-| TK_TIPO_VAZIO {insert_type();} {$$.nd = add_node(NULL, NULL, "type_void");}
+type: TK_TIPO_INT {insert_type();} //{$$.nd = add_node(NULL, NULL, "INT");}
+| TK_TIPO_FLOAT {insert_type();} //{$$.nd = add_node(NULL, NULL, "FLOAT");}
+| TK_TIPO_CHAR {insert_type();} //{$$.nd = add_node(NULL, NULL, "CHAR");}
+| TK_TIPO_STRING {insert_type();} //{$$.nd = add_node(NULL, NULL, "STRING");}
+| TK_TIPO_VAZIO {insert_type();} //{$$.nd = add_node(NULL, NULL, "VAZIO");}
 ;
 
 
@@ -177,30 +188,30 @@ condition: value op value  {
 ;
 
 //tentar tirar a recursao a esquerda
-expression: expression arithmetic expression /*{
+expression: expression arithmetic expression {
   if(!strcmp($1.type, $3.type)) {
-		sprintf($$.type, $1.type);
+		sprintf($$.type,"%s", $1.type);
 		$$.nd = add_node($1.nd, $3.nd, $2.name); 
 	}
   else{
-		sprintf(errors[count_errors], "Linha %d: as expressoes possuem tipos diferentes\n", count_line+1);    
+		sprintf(errors[count_errors], "Linha %d: as expressoes possuem tipos diferentes\n", count_line);    
   }
-  sprintf(icg[ic_idx++], "%s = %s %s %s\n",  $$.name, $1.name, $2.name, $3.name);
-}*/
-| '(' expression arithmetic expression ')'/*{
+  //sprintf(icg[ic_idx++], "%s = %s %s %s\n",  $$.name, $1.name, $2.name, $3.name);
+}
+| '(' expression arithmetic expression ')'{
   if(!strcmp($2.type, $4.type)) {
-		sprintf($$.type, $2.type);
+		sprintf($$.type,"%s", $2.type);
 		$$.nd = add_node($2.nd, $4.nd, $2.name); 
 	}
   else{
-		sprintf(errors[count_errors], "Linha %d: as expressoes possuem tipos diferentes\n", count_line+1);    
+		sprintf(errors[count_errors], "Linha %d: as expressoes possuem tipos diferentes\n", count_line);    
   }
-}*/
-| value //{ $$.nd = $1.nd; sprintf($$.type, $1.type); strcpy($$.name, $1.name); }
-| expression TK_AND expression //{add_node($1.nd, $3.nd, "expresion4");}
-| expression TK_OR expression //{add_node($1.nd, $3.nd, "expresion5");}
+}
+| value { strcpy($$.type, $1.name); sprintf($$.type, $1.type); $$.nd = $1.nd; }
+| expression TK_AND expression {add_node($1.nd, $3.nd, "expresion4");}
+| expression TK_OR expression {add_node($1.nd, $3.nd, "expresion5");}
 
-| '(' value ')' //{ $$.nd = $2.nd; sprintf($$.type, $2.type); strcpy($$.name, $2.name); }
+| '(' value ')' { strcpy($$.name, $2.name); sprintf($$.type, $2.type); $$.nd = $2.nd;}
 ; 
 
 arithmetic: TK_SOMA 
@@ -216,15 +227,29 @@ op: TK_MAIOR
 | TK_DIFERENTE 
 ;
 
-value: TK_INT {add('c');} //{ strcpy($$.name, $1.name); sprintf($$.type, "INT"); $$.nd = add_node(NULL, NULL, $1.name); }
-| TK_FLOAT {add('c');} //{ strcpy($$.name, $1.name); sprintf($$.type, "FLOAT"); $$.nd = add_node(NULL, NULL, $1.name); }
-| TK_CHAR {add('c');} //{ strcpy($$.name, $1.name); sprintf($$.type, "CHAR"); $$.nd = add_node(NULL, NULL, $1.name); }
-| TK_STRING {add('c');} //{ strcpy($$.name, $1.name); sprintf($$.type, "STRING"); $$.nd = add_node(NULL, NULL, $1.name); }
-| TK_ID  {check_declaration($1.name);} //{ strcpy($$.name, $1.name); char *id_type = get_type($1.name); sprintf($$.type, id_type);$$.nd = add_node(NULL, NULL, $1.name); }
+value: TK_INT {add('c');} { strcpy($$.name, $1.name); sprintf($$.type, "INT"); $$.nd = add_node(NULL, NULL, $1.name); }
+| TK_FLOAT {add('c');} { strcpy($$.name, $1.name); sprintf($$.type, "FLOAT"); $$.nd = add_node(NULL, NULL, $1.name); }
+| TK_CHAR {add('c');} { strcpy($$.name, $1.name); sprintf($$.type, "CHAR"); $$.nd = add_node(NULL, NULL, $1.name); }
+| TK_STRING {add('c');} { strcpy($$.name, $1.name); sprintf($$.type, "STRING"); $$.nd = add_node(NULL, NULL, $1.name); }
+| TK_ID  {check_declaration($1.name);} { 
+  strcpy($$.name, $1.name); 
+  char *id_type = get_type($1.name); 
+  if(id_type==NULL){
+    sprintf($$.type, "NULL");
+  }
+  else{
+    sprintf($$.type, id_type);
+  }
+  $$.nd = add_node(NULL, NULL, $1.name); }
 ;
 
-return: TK_RETORNE {add('k');} value ';' //{ check_return($3.name); $1.nd = add_node(NULL, NULL, "RETURN"); $$.nd = add_node($1.nd, $3.nd, "RETURN"); }
-| {$$.nd = NULL;}
+return: TK_RETORNE {add('r');} value ';' { check_return($3.name); $1.nd = add_node(NULL, NULL, "return"); $$.nd = add_node($1.nd, $3.nd, "RETURN"); }
+| { 
+    $$.nd = NULL; 
+    function_return = NULL;
+    check_return("NULL");
+}
+;
 ;
 
 %%
@@ -255,51 +280,53 @@ void check_declaration(char *c) {
         sprintf(errors[count_errors], "Linha %d: variavel ou atributo %s nao foi declarada\n", count_line, c);    
         count_errors++;    
     }
-}  
+}
 
 int check_type(char *type1, char *type2){
 	
-	if(!strcmp(type2, "null"))
+	if(!strcmp(type2, "null")){
 		return -1;
-
-	if(!strcmp(type1, type2))
+  }
+	if(!strcmp(type1, type2)){
 		return 0;
-  if(!strcmp(type1, "FLOAT") && !strcmp(type2, "INT"))
+  }
+  if(!strcmp(type1, "FLOAT") && !strcmp(type2, "INT")){
     sprintf(errors[count_errors], "Linha %d: esperado tipo float porem recebeu tipo int\n", count_line);    
     count_errors++;  
-		
-	if(!strcmp(type1, "INT") && !strcmp(type2, "FLOAT"))
+  }	
+	if(!strcmp(type1, "INT") && !strcmp(type2, "FLOAT")){
 		sprintf(errors[count_errors], "Linha %d: esperado tipo int porem recebeu tipo float\n", count_line);    
     count_errors++;  
-
-	if(!strcmp(type1, "INT") && !strcmp(type2, "CHAR"))
+  }
+	if(!strcmp(type1, "INT") && !strcmp(type2, "CHAR")){
 		sprintf(errors[count_errors], "Linha %d: esperado tipo int porem recebeu tipo char\n", count_line);    
     count_errors++;  
-
-	if(!strcmp(type1, "CHAR") && !strcmp(type2, "INT"))
+  }
+	if(!strcmp(type1, "CHAR") && !strcmp(type2, "INT")){
 		sprintf(errors[count_errors], "Linha %d: esperado tipo char porem recebeu tipo int\n", count_line);    
     count_errors++;  
-
-	if(!strcmp(type1, "FLOAT") && !strcmp(type2, "CHAR"))
+  }
+	if(!strcmp(type1, "FLOAT") && !strcmp(type2, "CHAR")){
 		sprintf(errors[count_errors], "Linha %d: esperado tipo float porem recebeu tipo char\n", count_line);    
     count_errors++;  
-
-	if(!strcmp(type1, "CHAR") && !strcmp(type2, "FLOAT"))
+  }
+	if(!strcmp(type1, "CHAR") && !strcmp(type2, "FLOAT")){
 		sprintf(errors[count_errors], "Linha %d: esperado tipo char porem recebeu tipo float\n", count_line);    
     count_errors++;  
-
-  if(!strcmp(type1, "INT") && !strcmp(type2, "STRING"))
+  }
+  if(!strcmp(type1, "INT") && !strcmp(type2, "STRING")){
 		sprintf(errors[count_errors], "Linha %d: esperado tipo int porem recebeu tipo string\n", count_line);    
     count_errors++;  
-
-  if(!strcmp(type1, "CHAR") && !strcmp(type2, "STRING"))
+  }
+  if(!strcmp(type1, "CHAR") && !strcmp(type2, "STRING")){
 		sprintf(errors[count_errors], "Linha %d: esperado tipo float porem recebeu tipo int\n", count_line);    
     count_errors++;  
-
-  if(!strcmp(type1, "FLOAT") && !strcmp(type2, "STRING"))
+  }
+  if(!strcmp(type1, "FLOAT") && !strcmp(type2, "STRING")){
 		sprintf(errors[count_errors], "Linha %d: esperado tipo float porem recebeu tipo int\n", count_line);    
     count_errors++;  
- 
+  }
+  return -1;
 
 }
 
@@ -312,15 +339,37 @@ char *get_type(char *var){
 }
 
 void check_return(char *value) {
-	char *main_datatype = get_type("method");
+	char *function_datatype = get_type("method");
+	//char *function_datatype = get_type(symbol_table[count-1].data_type);
 	char *return_datatype = get_type(value);
-	if((!strcmp(main_datatype, "INT") && !strcmp(return_datatype, "CONST")) || !strcmp(main_datatype, return_datatype)){
+  
+	if((!strcmp(function_datatype, "INT") && !strcmp(return_datatype, "CONST")) || !strcmp(function_datatype, return_datatype)){
 		return ;
 	}
 	else {
 		sprintf(errors[count_errors], "Linha %d: retorno nao esperado\n", count_line);
 		count_errors++;
 	}
+  /*
+  if(!strcmp(value, "NULL")) {
+        sprintf(errors[count_errors], "Erro na linha %d: retorno da funcao nao encontrado\n", count_line);
+        count_errors++;
+        return;
+  }
+
+  if(function_datatype != NULL && return_datatype != NULL) {
+
+        if (return_datatype == NULL ||(!strcmp(function_datatype, "INT") && !strcmp(return_datatype, "CONST")) || !strcmp(function_datatype, return_datatype)) {
+            return;
+        }
+        else{
+            sprintf(errors[count_errors], "Erro na linha %d: o retorno apresenta um tipo diferente do esperado\n", count_line);
+        }
+  }
+  */
+  
+
+
 }
 int search(char *name) {
 	int i;
@@ -410,6 +459,14 @@ void add(char c) {
           symbol_table[count].data_type=strdup(type);
           symbol_table[count].line=count_line;
           symbol_table[count].type=strdup("object");
+          count++;
+        }
+        else if(c == 'r') {
+          symbol_table[count].name=strdup(yylval.node_struct.name);
+          symbol_table[count].data_type=strdup(function_return);
+          function_return= NULL;
+          symbol_table[count].line=count_line;
+          symbol_table[count].type=strdup("return");
           count++;
         }
       }

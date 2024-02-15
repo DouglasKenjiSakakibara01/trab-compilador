@@ -4,7 +4,7 @@ CLASSE Exemplo{
     INT var1;
     INT var2;
     Teste var3= CLASSE Teste();
-    VAZIO funcao(){
+    INT funcao(){
         INT t;
         FLOAT v = 2.0;
         FLOAT v2 = 3.0;
