@@ -86,7 +86,9 @@ extern int yydebug;
     TK_AND = 287,                  /* TK_AND  */
     TK_OR = 288,                   /* TK_OR  */
     TK_NOME_CLASSE = 289,          /* TK_NOME_CLASSE  */
-    TK_IGUALDADE = 290             /* TK_IGUALDADE  */
+    TK_IGUALDADE = 290,            /* TK_IGUALDADE  */
+    TK_CLASSE_PRINCIPAL = 291,     /* TK_CLASSE_PRINCIPAL  */
+    TK_METODO_MAIN = 292           /* TK_METODO_MAIN  */
   };
   typedef enum yytokentype yytoken_kind_t;
 #endif
@@ -128,26 +130,28 @@ extern int yydebug;
 #define TK_OR 288
 #define TK_NOME_CLASSE 289
 #define TK_IGUALDADE 290
+#define TK_CLASSE_PRINCIPAL 291
+#define TK_METODO_MAIN 292
 
 /* Value type.  */
 #if ! defined YYSTYPE && ! defined YYSTYPE_IS_DECLARED
 union YYSTYPE
 {
-#line 49 "sintatica_testeSemantica.y"
+#line 50 "sintatica_semantica.y"
  
-	struct node_type { 
-		char name[100]; 
+	
+    struct node_type { 
+		char name[50]; 
 		struct node* nd;
 	} node_struct; 
 
-  struct node_type2 { 
-		char name[100]; 
+    struct node_type2 { 
+		char name[50]; 
 		struct node* nd;
-    char type[5];
-	} node_struct2; 
+        char type[5];
+	} node_struct2;
 
-
-#line 151 "y.tab.h"
+#line 155 "y.tab.h"
 
 };
 typedef union YYSTYPE YYSTYPE;

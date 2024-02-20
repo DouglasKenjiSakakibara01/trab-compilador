@@ -18,7 +18,9 @@ digito [0-9]
 "CHAR"                      { strcpy(yylval.node_struct.name,(yytext)); printf("[%s]: TK_TIPO_CHAR\n",yytext) ; return TK_TIPO_CHAR; }
 "VAZIO"                      { strcpy(yylval.node_struct.name,(yytext)); printf("[%s]: TK_TIPO_VAZIO\n",yytext); return TK_TIPO_VAZIO; }
 "STRING"                     { strcpy(yylval.node_struct.name,(yytext)); printf("[%s]: TK_TIPO_STRING\n",yytext); return TK_TIPO_STRING; }
+"Principal"                     { strcpy(yylval.node_struct.name,(yytext)); printf("[%s]: TK_CLASSE_PRINCIPAL\n",yytext); return TK_CLASSE_PRINCIPAL;}
 "CLASSE"                     { strcpy(yylval.node_struct.name,(yytext)); printf("[%s]: TK_CLASSE\n",yytext); return TK_CLASSE; }
+"MAIN"                     { strcpy(yylval.node_struct.name,(yytext)); printf("[%s]: TK_METODO_MAIN\n",yytext); return TK_METODO_MAIN; }
 "ESCREVA"                    { strcpy(yylval.node_struct.name,(yytext)); printf("[%s]: TK_ESCREVA\n",yytext); return TK_ESCREVA; }
 "LEIA"                     { strcpy(yylval.node_struct.name,(yytext)); printf("[%s]: TK_LEIA\n",yytext); return TK_LEIA; }
 "RETORNE"                    { strcpy(yylval.node_struct.name,(yytext)); printf("[%s]: TK_RETORNE\n",yytext); return TK_RETORNE; }

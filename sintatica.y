@@ -194,6 +194,7 @@ int main() {
       free(symbol_table[i].name);
       free(symbol_table[i].type);
     }
+    
     printf("\n\n");
     printf("-*-*-*-*-*-* Arvore sintatica -*-*-*-*-**-*-*--*-\n\n");
     print_tree(head);
@@ -223,7 +224,7 @@ int search(char *name) {
     o - objects
 */
 void add(char c) {
-      query=search(yytext);
+      query=search(yylval.node_struct.name);
       if(!query) {
         if(c == 'h') {
           symbol_table[count].name=strdup(yylval.node_struct.name);

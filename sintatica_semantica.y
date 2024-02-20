@@ -10,20 +10,21 @@
     //int yywrap();
     void add(char);
     void insert_type();
-    int search(char *);
-    void check_declaration(char *);
-    void check_return(char *);
-    int check_type(char *, char *);
-    char *get_type(char *);
+    int search(const char *);
     void print_tree(struct node *);
     struct node* add_node(struct node *left, struct node *right, char *tk);
-
+    void check_declaration(const char *);
+    void check_return();
+    void check_type(const char *);
+    char *get_type(const char *);
+  
 
     struct data {
             int line;
             char * name;
             char * data_type;
             char * type;
+            int scope;
             
     } symbol_table[40];
     
@@ -37,54 +38,56 @@
     char type[10];
     extern int count_line; // representa a linha do codigo analisada 
     struct node *head; // comeco da arvore
-    //int label=0;
     char buffer[100];
     int count_errors=0;
     char errors[50][100];
-    int ic_idx=0;
-    char icg[50][100];
-    char *function_return;
+    int count_scope = 0;
+    int count_scope_class = 0;
+    
+
     
 %}
 %union { 
-	struct node_type { 
-		char name[100]; 
+	
+    struct node_type { 
+		char name[50]; 
 		struct node* nd;
 	} node_struct; 
 
-  struct node_type2 { 
-		char name[100]; 
+    struct node_type2 { 
+		char name[50]; 
 		struct node* nd;
-    char type[5];
-	} node_struct2; 
-
+        char type[5];
+	} node_struct2;
 } 
+
 %define parse.error verbose
 %token <node_struct> TK_ID  TK_TIPO_CHAR TK_TIPO_FLOAT TK_TIPO_INT TK_TIPO_STRING TK_PARA TK_INT
 TK_SE TK_SENAO TK_MAIOR TK_MAIOR_IGUAL TK_MENOR TK_MENOR_IGUAL TK_DIFERENTE TK_FLOAT TK_VERDADEIRO TK_FALSO
 TK_LEIA TK_CHAR TK_STRING TK_ESCREVA TK_INCLUDE TK_RETORNE  TK_TIPO_VAZIO TK_CLASSE 
-TK_SOMA, TK_SUBTRACAO, TK_MULTIPLICACAO, TK_DIVISAO TK_AND TK_OR  TK_NOME_CLASSE TK_IGUALDADE 
+TK_SOMA, TK_SUBTRACAO, TK_MULTIPLICACAO, TK_DIVISAO TK_AND TK_OR  TK_NOME_CLASSE TK_IGUALDADE TK_CLASSE_PRINCIPAL TK_METODO_MAIN
 
 %type <node_struct> program headers method class class_atributes class_body parameters 
-return body else statement statement_atributes op condition arithmetic type 
+return body else statement statement_atributes op condition arithmetic  type class_body_main
 
 %type <node_struct2> value expression
-
 %%
 
-program: headers program {$$.nd = add_node($1.nd, $2.nd, "program_header"); head = $$.nd;}
-//| class program {$$.nd = add_node($1.nd, $2.nd, "program"); }
-| class {$$.nd = add_node($1.nd, NULL, "program"); head = $$.nd;}
-
-|{ $$.nd = NULL; };
+program: headers program {$$.nd = add_node($1.nd, $2.nd, "program"); head = $$.nd;}
+| class program {$$.nd = add_node($1.nd, $2.nd, "program"); }
+| headers TK_CLASSE TK_CLASSE_PRINCIPAL{add('s');} '{' class_body_main '}'
+|{ $$.nd = NULL; }
 ;
 
 headers: TK_INCLUDE {add('h');} {$$.nd = add_node(NULL, NULL, "INCLUDE");}
 |TK_INCLUDE {add('h');} headers {$$.nd = add_node($3.nd, NULL, "INCLUDE2");}
+|{$$.nd = NULL;}
 ;
 
 class: TK_CLASSE TK_NOME_CLASSE {add('s');} '{' class_body '}'  {$$.nd = add_node($5.nd, NULL, "class");}
 ;
+
+class_body_main: type TK_METODO_MAIN {add('m');} '(' parameters ')' '{' body '}';
 
 class_body: class_atributes class_body {$$.nd = add_node($1.nd, $2.nd, "class_body_atributes");}
 |  TK_NOME_CLASSE TK_ID {add('o');}'=' TK_CLASSE TK_NOME_CLASSE '(' ')' ';' class_body {$$.nd = add_node($1.nd, $2.nd, "class_body_object");}
@@ -140,41 +143,17 @@ else: TK_SENAO {add('k');} '{' body '}' {$$.nd = add_node($4.nd, NULL, "else_bod
 
 
 statement: type TK_ID {add('v');} {$$.nd = add_node($1.nd, NULL, "statement1");}
-| type TK_ID  {add('v');} '=' expression  { 
-	$2.nd = add_node(NULL, NULL, $2.name); 
-	int t = check_type($1.name, $5.type); 
-  char *id_type = get_type($1.name);
-  if (t==0){
-      $$.nd = add_node($2.nd, $5.nd, "statement2"); 
-  }
-  else{
-      sprintf(errors[count_errors], "Linha %d: a variavel %s recebe um valor de tipo diferente\n", $2.name,  count_line);
-  }    
-}
-| TK_ID { check_declaration($1.name); } '=' expression {
-	$1.nd = add_node(NULL, NULL, $1.name); 
-	char *id_type = get_type($1.name); 
-	//int t = check_type(id_type, $4.type); 
-  if(id_type!=NULL){
-    if(!strcmp(id_type, $4.type)){
-	    $$.nd = add_node($1.nd, $4.nd, "statement3"); 
-      sprintf(icg[ic_idx++], "%s = %s\n", $1.name, $4.name);
-    }   
-    else{
-      sprintf(errors[count_errors], "Linha %d: a variavel %s recebe um valor de tipo diferente\n",$1.name,  count_line+1);
-
-    }  
-  }
-  } 
-| TK_ID { check_declaration($1.name); } op expression {$1.nd = add_node(NULL, NULL, $1.name); $$.nd = add_node($1.nd, $4.nd, $3.name);}
+| type TK_ID  {add('v');} '=' expression  {$$.nd = add_node($1.nd, $5.nd, "statement2"); check_type($2.name);}
+| TK_ID {check_declaration($1.name);} '=' expression {$$.nd = add_node($4.nd, NULL, "statement3"); check_type($1.name);}
+| TK_ID {check_declaration($1.name);} op expression {$$.nd = add_node($3.nd, $3.nd, "statement4");}
 ;
 
 
-type: TK_TIPO_INT {insert_type();} //{$$.nd = add_node(NULL, NULL, "INT");}
-| TK_TIPO_FLOAT {insert_type();} //{$$.nd = add_node(NULL, NULL, "FLOAT");}
-| TK_TIPO_CHAR {insert_type();} //{$$.nd = add_node(NULL, NULL, "CHAR");}
-| TK_TIPO_STRING {insert_type();} //{$$.nd = add_node(NULL, NULL, "STRING");}
-| TK_TIPO_VAZIO {insert_type();} //{$$.nd = add_node(NULL, NULL, "VAZIO");}
+type: TK_TIPO_INT {insert_type();} {$$.nd = add_node(NULL, NULL, "type_int");}
+| TK_TIPO_FLOAT {insert_type();} {$$.nd = add_node(NULL, NULL, "type_float");}
+| TK_TIPO_CHAR {insert_type();} {$$.nd = add_node(NULL, NULL, "type_char");}
+| TK_TIPO_STRING {insert_type();} {$$.nd = add_node(NULL, NULL, "type_string");}
+| TK_TIPO_VAZIO {insert_type();} {$$.nd = add_node(NULL, NULL, "type_void");}
 ;
 
 
@@ -189,189 +168,116 @@ condition: value op value  {
 
 //tentar tirar a recursao a esquerda
 expression: expression arithmetic expression {
-  if(!strcmp($1.type, $3.type)) {
-		sprintf($$.type,"%s", $1.type);
-		$$.nd = add_node($1.nd, $3.nd, $2.name); 
-	}
-  else{
-		sprintf(errors[count_errors], "Linha %d: as expressoes possuem tipos diferentes\n", count_line);    
-  }
-  //sprintf(icg[ic_idx++], "%s = %s %s %s\n",  $$.name, $1.name, $2.name, $3.name);
+  struct node *aux = add_node($2.nd, $3.nd, "expression1_aux"); 
+  $$.nd = add_node($1.nd, aux, "expression1");
 }
 | '(' expression arithmetic expression ')'{
-  if(!strcmp($2.type, $4.type)) {
-		sprintf($$.type,"%s", $2.type);
-		$$.nd = add_node($2.nd, $4.nd, $2.name); 
-	}
-  else{
-		sprintf(errors[count_errors], "Linha %d: as expressoes possuem tipos diferentes\n", count_line);    
-  }
+  struct node *aux = add_node($3.nd, $4.nd, "expression2_aux"); 
+  $$.nd = add_node($2.nd, aux, "expression2");
 }
-| value { strcpy($$.type, $1.name); sprintf($$.type, $1.type); $$.nd = $1.nd; }
+| value {$$.nd = add_node($1.nd, NULL, "expresion3");}
 | expression TK_AND expression {add_node($1.nd, $3.nd, "expresion4");}
 | expression TK_OR expression {add_node($1.nd, $3.nd, "expresion5");}
-
-| '(' value ')' { strcpy($$.name, $2.name); sprintf($$.type, $2.type); $$.nd = $2.nd;}
-; 
-
-arithmetic: TK_SOMA 
-| TK_SUBTRACAO  
-| TK_MULTIPLICACAO 
-| TK_DIVISAO 
+| '(' value ')' {add_node($2.nd, NULL, "expresion6");}
 ;
 
-op: TK_MAIOR 
-| TK_MAIOR_IGUAL 
-| TK_MENOR 
-| TK_MENOR_IGUAL 
-| TK_DIFERENTE 
+arithmetic: TK_SOMA {$$.nd = add_node(NULL, NULL, "arithmetic_sum");}
+| TK_SUBTRACAO  {$$.nd = add_node(NULL, NULL, "arithmetic_sub");}
+| TK_MULTIPLICACAO {$$.nd = add_node(NULL, NULL, "arithmetic_mult");}
+| TK_DIVISAO {$$.nd = add_node(NULL, NULL, "arithmetic_div");}
 ;
 
-value: TK_INT {add('c');} { strcpy($$.name, $1.name); sprintf($$.type, "INT"); $$.nd = add_node(NULL, NULL, $1.name); }
-| TK_FLOAT {add('c');} { strcpy($$.name, $1.name); sprintf($$.type, "FLOAT"); $$.nd = add_node(NULL, NULL, $1.name); }
-| TK_CHAR {add('c');} { strcpy($$.name, $1.name); sprintf($$.type, "CHAR"); $$.nd = add_node(NULL, NULL, $1.name); }
-| TK_STRING {add('c');} { strcpy($$.name, $1.name); sprintf($$.type, "STRING"); $$.nd = add_node(NULL, NULL, $1.name); }
-| TK_ID  {check_declaration($1.name);} { 
-  strcpy($$.name, $1.name); 
-  char *id_type = get_type($1.name); 
-  if(id_type==NULL){
-    sprintf($$.type, "NULL");
-  }
-  else{
-    sprintf($$.type, id_type);
-  }
-  $$.nd = add_node(NULL, NULL, $1.name); }
+op: TK_MAIOR {$$.nd = add_node(NULL, NULL, "op_>");}
+| TK_MAIOR_IGUAL {$$.nd = add_node(NULL, NULL, "op_>=");}
+| TK_MENOR {$$.nd = add_node(NULL, NULL, "op_<");}
+| TK_MENOR_IGUAL {$$.nd = add_node(NULL, NULL, "op_<=");}
+| TK_DIFERENTE {$$.nd = add_node(NULL, NULL, "op_!=");}
 ;
 
-return: TK_RETORNE {add('r');} value ';' { check_return($3.name); $1.nd = add_node(NULL, NULL, "return"); $$.nd = add_node($1.nd, $3.nd, "RETURN"); }
-| { 
-    $$.nd = NULL; 
-    function_return = NULL;
-    check_return("NULL");
-}
+value: TK_INT {add('c');} {$$.nd = add_node(NULL, NULL, "value_int");}
+| TK_FLOAT {add('c');} {$$.nd = add_node(NULL, NULL, "value_float");}
+| TK_CHAR {add('c');} {$$.nd = add_node(NULL, NULL, "value_char");}
+| TK_STRING {add('c');} {$$.nd = add_node(NULL, NULL, "value_string");}
+| TK_ID {check_declaration($1.name);} 
 ;
+
+return: TK_RETORNE {add('k');} value ';' {$$.nd = add_node($3.nd, NULL, "return"); check_return();}
+| {$$.nd = NULL;}
 ;
 
 %%
 
-// falta tratar para rodar com mais de um arquivo 
+// falta tratar para rodar com mais de um arquivo , classe principal, objetos(atributos), parametros
 int main() {
     yyparse();
     printf("-*-*-*-*-*-* Tabela de simbolos -*-*-*-*-**-*-*--*-\n");
     for(int i=0; i<count; i++) {
-      printf("%s\t%s\t%s\t%d\t\n", symbol_table[i].name, symbol_table[i].data_type, symbol_table[i].type, symbol_table[i].line);
+      printf("%s\t%s\t%s\t%d\t%d\t\n", symbol_table[i].name, symbol_table[i].data_type, symbol_table[i].type, symbol_table[i]. scope, symbol_table[i].line);
     }
     for(int i=0;i<count;i++) {
       free(symbol_table[i].name);
       free(symbol_table[i].type);
     }
+    
     printf("\n\n");
     printf("-*-*-*-*-*-* Arvore sintatica -*-*-*-*-**-*-*--*-\n\n");
     print_tree(head);
     printf("\n\n");
-    
+
     printf(" Quantidade de erros:%d\n",count_errors);
-    for(int i=0; i<count_errors; i++)
+    for(int i=0; i<count_errors; i++) {
       printf("%s\n",errors[i]);
+    } 
   }
-void check_declaration(char *c) {    
+
+void check_declaration(const char *c) {    
     query = search(c);    
     if(!query) {        
-        sprintf(errors[count_errors], "Linha %d: variavel ou atributo %s nao foi declarada\n", count_line, c);    
+        sprintf(errors[count_errors], "Linha %d: estrutura %s nao foi declarada\n", count_line, c);    
         count_errors++;    
     }
 }
-
-int check_type(char *type1, char *type2){
-	
-	if(!strcmp(type2, "null")){
-		return -1;
+// utilizada somente para auxiliar a funcao de adicionar informacoes na tabela de simbolos
+int check_value(const char *c){
+  int v_float=-1;
+  for (int i = 1; i < 50; i++) {
+        if (c[i] == '.') {
+            v_float=1;
+            break;
+        }
+    }
+  if(c[0] =='\''){
+    return 0;
   }
-	if(!strcmp(type1, type2)){
-		return 0;
+  else if(c[0] == '"'){
+    return 1;
   }
-  if(!strcmp(type1, "FLOAT") && !strcmp(type2, "INT")){
-    sprintf(errors[count_errors], "Linha %d: esperado tipo float porem recebeu tipo int\n", count_line);    
-    count_errors++;  
-  }	
-	if(!strcmp(type1, "INT") && !strcmp(type2, "FLOAT")){
-		sprintf(errors[count_errors], "Linha %d: esperado tipo int porem recebeu tipo float\n", count_line);    
-    count_errors++;  
+  else if(v_float == 1){
+    return 2;
   }
-	if(!strcmp(type1, "INT") && !strcmp(type2, "CHAR")){
-		sprintf(errors[count_errors], "Linha %d: esperado tipo int porem recebeu tipo char\n", count_line);    
-    count_errors++;  
+  else{
+    return 3;
   }
-	if(!strcmp(type1, "CHAR") && !strcmp(type2, "INT")){
-		sprintf(errors[count_errors], "Linha %d: esperado tipo char porem recebeu tipo int\n", count_line);    
-    count_errors++;  
-  }
-	if(!strcmp(type1, "FLOAT") && !strcmp(type2, "CHAR")){
-		sprintf(errors[count_errors], "Linha %d: esperado tipo float porem recebeu tipo char\n", count_line);    
-    count_errors++;  
-  }
-	if(!strcmp(type1, "CHAR") && !strcmp(type2, "FLOAT")){
-		sprintf(errors[count_errors], "Linha %d: esperado tipo char porem recebeu tipo float\n", count_line);    
-    count_errors++;  
-  }
-  if(!strcmp(type1, "INT") && !strcmp(type2, "STRING")){
-		sprintf(errors[count_errors], "Linha %d: esperado tipo int porem recebeu tipo string\n", count_line);    
-    count_errors++;  
-  }
-  if(!strcmp(type1, "CHAR") && !strcmp(type2, "STRING")){
-		sprintf(errors[count_errors], "Linha %d: esperado tipo float porem recebeu tipo int\n", count_line);    
-    count_errors++;  
-  }
-  if(!strcmp(type1, "FLOAT") && !strcmp(type2, "STRING")){
-		sprintf(errors[count_errors], "Linha %d: esperado tipo float porem recebeu tipo int\n", count_line);    
-    count_errors++;  
-  }
-  return -1;
-
 }
-
-char *get_type(char *var){
-	for(int i=0; i<count; i++) {
-		if(!strcmp(symbol_table[i].name, var)) {
-			return symbol_table[i].data_type;
+void check_type(const char * c1){
+  int i;
+  int index_var=-1;
+  int index_value=count-1;
+	for(i=count-1; i>=0; i--) {
+		if(strcmp(symbol_table[i].name, c1)==0) {
+      index_var=i;
 		}
 	}
+  if(index_var!=-1){
+    if(strcmp(symbol_table[index_var].data_type, symbol_table[index_value].data_type)){
+      sprintf(errors[count_errors], "Linha %d: A estrutura %s do tipo %s recebe um valor do tipo %s\n", count_line, symbol_table[index_var].name, symbol_table[index_var].data_type, symbol_table[index_value].data_type);    
+      count_errors++;  
+    }
+  }
 }
 
-void check_return(char *value) {
-	char *function_datatype = get_type("method");
-	//char *function_datatype = get_type(symbol_table[count-1].data_type);
-	char *return_datatype = get_type(value);
-  
-	if((!strcmp(function_datatype, "INT") && !strcmp(return_datatype, "CONST")) || !strcmp(function_datatype, return_datatype)){
-		return ;
-	}
-	else {
-		sprintf(errors[count_errors], "Linha %d: retorno nao esperado\n", count_line);
-		count_errors++;
-	}
-  /*
-  if(!strcmp(value, "NULL")) {
-        sprintf(errors[count_errors], "Erro na linha %d: retorno da funcao nao encontrado\n", count_line);
-        count_errors++;
-        return;
-  }
 
-  if(function_datatype != NULL && return_datatype != NULL) {
-
-        if (return_datatype == NULL ||(!strcmp(function_datatype, "INT") && !strcmp(return_datatype, "CONST")) || !strcmp(function_datatype, return_datatype)) {
-            return;
-        }
-        else{
-            sprintf(errors[count_errors], "Erro na linha %d: o retorno apresenta um tipo diferente do esperado\n", count_line);
-        }
-  }
-  */
-  
-
-
-}
-int search(char *name) {
+int search(const char *name) {
 	int i;
 	for(i=count-1; i>=0; i--) {
 		if(strcmp(symbol_table[i].name, name)==0) {
@@ -392,11 +298,40 @@ int search(char *name) {
     p - parameters
     o - objects
 */
-void add(char c) {
-      //query=search(yytext);
-      query=search(yylval.node_struct.name);
 
-      if(!query) {
+// verifica se as declaracoes de variaveis estao no mesmo escopo
+int check_scope(const char *name){
+  int i;
+	for(i=count-1; i>=0; i--) {
+		if(strcmp(symbol_table[i].name, name)== 0) {
+      if(symbol_table[i].scope == count_scope){
+			  return -1;
+			  break;
+      }
+    }
+	}
+	return 0;
+}
+
+void check_return(){
+  int index_method = -1;
+  for(int i=count-1; i>=0; i--) {
+    if(strcmp(symbol_table[i].type, "method") == 0){
+      index_method = i;
+
+    }
+  }
+  if(symbol_table[index_method].data_type!="VAZIO" && strcmp(symbol_table[count-1].data_type,symbol_table[index_method].data_type )){
+    sprintf(errors[count_errors], "Linha %d: A funcao %s do tipo %s retorna um valor do tipo %s\n", count_line, symbol_table[index_method].name, symbol_table[index_method].data_type, symbol_table[count-1].data_type);    
+    count_errors++;  
+
+  }
+
+}
+void add(char c) {
+      //query = search(yylval.node_struct.name);
+      int result = check_scope(yylval.node_struct.name);
+      if(!result){
         if(c == 'h') {
           symbol_table[count].name=strdup(yylval.node_struct.name);
           symbol_table[count].data_type=strdup(type);
@@ -416,14 +351,46 @@ void add(char c) {
           symbol_table[count].data_type=strdup(type);
           symbol_table[count].line=count_line;
           symbol_table[count].type=strdup("variable");
+          symbol_table[count].scope=count_scope;
           count++;
         }
         else if(c == 'c') {
-          symbol_table[count].name=strdup(yylval.node_struct.name);
-          symbol_table[count].data_type=strdup("CONST");
-          symbol_table[count].line=count_line;
-          symbol_table[count].type=strdup("constant");
-          count++;
+          char *v = strdup(yylval.node_struct.name);
+          int result = check_value(v);
+          if(result == 0){
+            symbol_table[count].name=strdup(yylval.node_struct.name);
+            symbol_table[count].data_type=strdup("CHAR");
+            symbol_table[count].line=count_line;
+            symbol_table[count].type=strdup("constant");
+            count++;
+
+          }
+          else if(result == 1){
+            symbol_table[count].name=strdup(yylval.node_struct.name);
+            symbol_table[count].data_type=strdup("STRING");
+            symbol_table[count].line=count_line;
+            symbol_table[count].type=strdup("constant");
+            count++;
+
+          }
+
+          else if(result == 2){
+            symbol_table[count].name=strdup(yylval.node_struct.name);
+            symbol_table[count].data_type=strdup("FLOAT");
+            symbol_table[count].line=count_line;
+            symbol_table[count].type=strdup("constant");
+            count++;
+            
+          }
+
+          else if(result == 3){
+            symbol_table[count].name=strdup(yylval.node_struct.name);
+            symbol_table[count].data_type=strdup("INT");
+            symbol_table[count].line=count_line;
+            symbol_table[count].type=strdup("constant");
+            count++;
+            
+          }
         }
         else if(c == 'm') {
           symbol_table[count].name=strdup(yylval.node_struct.name);
@@ -431,6 +398,7 @@ void add(char c) {
           symbol_table[count].line=count_line;
           symbol_table[count].type=strdup("method");
           count++;
+          count_scope++;
         }
         else if(c == 's') {
           symbol_table[count].name=strdup(yylval.node_struct.name);
@@ -461,22 +429,15 @@ void add(char c) {
           symbol_table[count].type=strdup("object");
           count++;
         }
-        else if(c == 'r') {
-          symbol_table[count].name=strdup(yylval.node_struct.name);
-          symbol_table[count].data_type=strdup(function_return);
-          function_return= NULL;
-          symbol_table[count].line=count_line;
-          symbol_table[count].type=strdup("return");
-          count++;
-        }
       }
-      // caso a variavel/atributo ja tenha sido adicionada
-      else if((c == 'v' || c == 'a') && query) {
+    
+    // caso a variavel/atributo ja tenha sido adicionada
+    else if((c == 'v' || c == 'a') && query) {
         
-        sprintf(errors[count_errors], "Linha %d: a variavel/atributo %s ja foi declarada \n", count_line, yylval.node_struct.name);
-
+        sprintf(errors[count_errors], "Linha %d: A estrutura %s ja foi declarada \n", count_line, yylval.node_struct.name);
 		    count_errors++;
     }
+      
     }
     
 void insert_type() {

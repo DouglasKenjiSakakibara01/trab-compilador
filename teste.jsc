@@ -6,13 +6,14 @@ CLASSE Exemplo{
     Teste var3= CLASSE Teste();
     INT funcao(){
         INT t;
-        FLOAT v = 2.0;
+        FLOAT v = "erro";
         FLOAT v2 = 3.0;
         INT a = 0;
         INT a = 1; //ja foi declarada
         b=0; // nao foi declarada
-
-        PARA(a=0; a>20; a=a+1){
+        INT c;
+        c='c';
+        PARA(INT d=0; d>20; d=d+1){
             ESCREVA("teste for");
         }
         SE(t==0){
@@ -24,6 +25,12 @@ CLASSE Exemplo{
 
         } 
         
+        RETORNE "erro";
+    }
+
+    INT funcao2(){
+        INT t;
+       
         RETORNE 0;
     }
 }
