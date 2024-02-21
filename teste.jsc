@@ -18,6 +18,7 @@ CLASSE Teste{
         INT c;
         c='c'; // (erro)
         Teste f;
+        f.var4;
         
         PARA(INT d=0; d>20; d=d+1){
             ESCREVA("teste for");

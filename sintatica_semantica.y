@@ -18,6 +18,8 @@
     void check_type(const char *);
     char *get_type(const char *);
     void aux_check_class();
+    int search2(const char *name);
+    void check_declaration2(const char *c);
 
     struct data {
             int line;
@@ -49,6 +51,8 @@
     int count_scope = 0;
     int count_scope_class = 0;
     char class_name[30]; // usado para auxiliar na verificacao da classe de um objeto
+    char object_name[30]; // usado para auxiliar o acesso a um tributo do objeto
+    int index_object = 0;
     
 
     
@@ -80,8 +84,9 @@ return body else statement statement_atributes op condition arithmetic  type cla
 %%
 
 program: headers program {$$.nd = add_node($1.nd, $2.nd, "program"); head = $$.nd;}
-| class program {$$.nd = add_node($1.nd, $2.nd, "program"); }
-| headers TK_CLASSE TK_CLASSE_PRINCIPAL{add('s');} '{' class_body_main '}'
+//| class program {$$.nd = add_node($1.nd, $2.nd, "program"); }
+| class {$$.nd = add_node($1.nd, NULL , "program"); }
+| headers TK_CLASSE TK_CLASSE_PRINCIPAL {add('s');} '{' class_body_main '}' {$$.nd = add_node($1.nd, $6.nd, "program"); }
 |{ $$.nd = NULL; }
 ;
 
@@ -110,7 +115,7 @@ class_atributes: statement_atributes ';' {$$.nd = add_node($1.nd, NULL, "class_a
 ;
 
 statement_atributes:  type TK_ID {add('a');} '=' expression {$$.nd = add_node($1.nd, $5.nd, "statement_atributes2");}
-| type TK_ID {add('a');} {$$.nd = add_node($1.nd, NULL, "statement_atributes2");}
+| type TK_ID {add('a');} {$$.nd = add_node($1.nd, NULL, "statement_atributes2");} // declaracao objeto
 ;
 
 method: type TK_ID {add('m');} {$$.nd = add_node($1.nd, NULL, "method");}
@@ -137,7 +142,9 @@ body: TK_PARA {add('k');} '(' statement ';' condition ';' statement ')' '{' body
 | TK_SE {add('k');} '(' condition ')' '{' body '}' {$$.nd = add_node($4.nd, $7.nd, "body_if");}
 | else {  $$.nd = add_node($1.nd, NULL, "body_if");} 
 | statement ';' {$$.nd = add_node($1.nd, NULL, "body_statement");}
-| TK_NOME_CLASSE {aux_check_class();} TK_ID {add('o');} ';' {$$.nd = add_node(NULL, NULL, "body_object");}
+| TK_NOME_CLASSE {aux_check_class();} TK_ID {add('o');} ';' {$$.nd = add_node(NULL, NULL, "body_object");} // declaracao objeto
+| TK_ID { check_declaration($1.name); } '.' TK_ID {check_declaration2($4.name);} ';'
+| TK_ID { check_declaration($1.name); } '.' TK_ID {check_declaration2($4.name);} '=' expression ';'
 | body body  {$$.nd = add_node($1.nd, $2.nd, "body");}
 | TK_ESCREVA {add('k');} '(' TK_STRING ')' ';' {$$.nd = add_node(NULL, NULL, "body_printf");}
 | TK_LEIA {add('k');} '(' TK_STRING ',' '&' TK_ID ')' ';' {$$.nd = add_node(NULL, NULL, "body_scanf");}
@@ -213,7 +220,7 @@ return: TK_RETORNE {add('k');} value ';' {$$.nd = add_node($3.nd, NULL, "return"
 
 %%
 
-// falta tratar para rodar com mais de um arquivo , classe principal, objetos(atributos), tem q adicionar um escopo de classe
+// falta tratar para rodar com mais de um arquivo , classe principal
 int main() {
     yyparse();
     printf("-*-*-*-*-*-* Tabela de simbolos -*-*-*-*-**-*-*--*-\n");
@@ -235,10 +242,26 @@ int main() {
       printf("%s\n",errors[i]);
     } 
   }
+// usado para verificar a declaracao de variaveis e atributos   
 void check_declaration(const char *c) {    
     query = search(c);    
-    if(!query) {        
+    if(query == -1) {        
         sprintf(errors[count_errors], "Linha %d: A estrutura %s nao foi declarada\n", count_line, c);    
+        count_errors++;    
+    }
+    else{
+      if(strcmp(symbol_table[query].type, "object") == 0){
+        index_object = query;
+
+      }
+      
+    }
+}
+// usado para verificar a declaracao metodos e atributos de uma classe referenciado por um objeto 
+void check_declaration2(const char *c) {    
+    query = search2(c);    
+    if(query ==-1) {        
+        sprintf(errors[count_errors], "Linha %d: A estrutura %s sendo acessado pelo objeto nao foi declarada\n", count_line, c);    
         count_errors++;    
     }
 }
@@ -305,12 +328,29 @@ int search(const char *name) {
 	for(i=count-1; i>=0; i--) {
 		if(strcmp(symbol_table[i].name, name)==0) {
       if(symbol_table[i].scope == count_scope){
-			  return -1;
+			  return i;
 			  break;
 		}
     } 
 	}
-	return 0;
+	return -1;
+} 
+// verifica se o atributo sendo acessado atraves do objeto foi declarado
+int search2(const char *name) {
+	int i;
+	for(i=count-1; i>=0; i--) {
+		if(strcmp(symbol_table[i].name, name)==0) {
+      if(index_object !=0){
+        if(symbol_table[index_object].scope_class == symbol_table[i].scope_class){
+          index_object = 0;
+          return i;
+        }
+      }
+      
+      
+    } 
+	}
+	return -1;
 } 
  
 
@@ -320,7 +360,7 @@ int check_scope(const char *name){
 	for(i=count-1; i>=0; i--) {
 		if(strcmp(symbol_table[i].name, name)== 0) { // verfica se existe esse nome na tabela
 
-      /*Caso ja tenha esse nome no mesmo escopo ou esse nome já seja um atributo da classe(caso seja de outra classe pode ser utilizado) 
+      /*Caso ja tenha esse nome no mesmo escopo(tambem já trata que funcoes nao tenha o mesmo nome em uma classe) ou esse nome já seja um atributo da classe(caso seja de outra classe pode ser utilizado) 
       */
       if(symbol_table[i].scope == count_scope || (strcmp(symbol_table[i].type, "attribute") == 0 && symbol_table[i].scope_class == count_scope_class)){ 
 			  return -1;
@@ -447,6 +487,7 @@ void add(char c) {
           symbol_table[count].data_type=strdup(type);
           symbol_table[count].line=count_line;
           symbol_table[count].type=strdup("attribute");
+          symbol_table[count].scope=count_scope;
           symbol_table[count].scope_class=count_scope_class;
           count++;
         }

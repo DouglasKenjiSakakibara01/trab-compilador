@@ -137,7 +137,7 @@ extern int yydebug;
 #if ! defined YYSTYPE && ! defined YYSTYPE_IS_DECLARED
 union YYSTYPE
 {
-#line 56 "sintatica_semantica.y"
+#line 60 "sintatica_semantica.y"
  
 	
     struct node_type { 
