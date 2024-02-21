@@ -17,7 +17,7 @@
     void check_return();
     void check_type(const char *);
     char *get_type(const char *);
-  
+    void aux_check_class();
 
     struct data {
             int line;
@@ -25,8 +25,13 @@
             char * data_type;
             char * type;
             int scope;
+            int scope_class;
             
-    } symbol_table[40];
+    } symbol_table[100];
+
+
+
+
     
     struct node { 
         struct node *left; 
@@ -43,6 +48,7 @@
     char errors[50][100];
     int count_scope = 0;
     int count_scope_class = 0;
+    char class_name[30]; // usado para auxiliar na verificacao da classe de um objeto
     
 
     
@@ -90,7 +96,7 @@ class: TK_CLASSE TK_NOME_CLASSE {add('s');} '{' class_body '}'  {$$.nd = add_nod
 class_body_main: type TK_METODO_MAIN {add('m');} '(' parameters ')' '{' body '}';
 
 class_body: class_atributes class_body {$$.nd = add_node($1.nd, $2.nd, "class_body_atributes");}
-|  TK_NOME_CLASSE TK_ID {add('o');}'=' TK_CLASSE TK_NOME_CLASSE '(' ')' ';' class_body {$$.nd = add_node($1.nd, $2.nd, "class_body_object");}
+|  TK_NOME_CLASSE {aux_check_class();} TK_ID {add('o');} ';' class_body {$$.nd = add_node($6.nd, NULL, "class_body_object");}
 |  method '(' parameters ')' '{' body return '}' class_body{
    struct node *aux = add_node($6.nd, $7.nd, "class_body_method_aux");
    struct node *aux2 = add_node(&*aux, $9.nd, "class_body_method_aux2");
@@ -111,8 +117,8 @@ method: type TK_ID {add('m');} {$$.nd = add_node($1.nd, NULL, "method");}
 ;
 
 
-parameters: type TK_ID',' parameters {$$.nd = add_node($1.nd, $4.nd, "parameters");}
-| type TK_ID {$$.nd = add_node($1.nd, NULL, "parameters2");}
+parameters: type TK_ID {add('p');} ',' parameters {$$.nd = add_node($1.nd, $5.nd, "parameters");}
+| type TK_ID {add('p'); $$.nd = add_node($1.nd, NULL, "parameters2");}
 | {$$.nd = NULL;}
 ;
 
@@ -131,7 +137,7 @@ body: TK_PARA {add('k');} '(' statement ';' condition ';' statement ')' '{' body
 | TK_SE {add('k');} '(' condition ')' '{' body '}' {$$.nd = add_node($4.nd, $7.nd, "body_if");}
 | else {  $$.nd = add_node($1.nd, NULL, "body_if");} 
 | statement ';' {$$.nd = add_node($1.nd, NULL, "body_statement");}
-| TK_NOME_CLASSE TK_ID {add('o');} '=' TK_CLASSE TK_NOME_CLASSE '(' ')' ';' {$$.nd = add_node(NULL, NULL, "body_object");}
+| TK_NOME_CLASSE {aux_check_class();} TK_ID {add('o');} ';' {$$.nd = add_node(NULL, NULL, "body_object");}
 | body body  {$$.nd = add_node($1.nd, $2.nd, "body");}
 | TK_ESCREVA {add('k');} '(' TK_STRING ')' ';' {$$.nd = add_node(NULL, NULL, "body_printf");}
 | TK_LEIA {add('k');} '(' TK_STRING ',' '&' TK_ID ')' ';' {$$.nd = add_node(NULL, NULL, "body_scanf");}
@@ -207,12 +213,12 @@ return: TK_RETORNE {add('k');} value ';' {$$.nd = add_node($3.nd, NULL, "return"
 
 %%
 
-// falta tratar para rodar com mais de um arquivo , classe principal, objetos(atributos), parametros
+// falta tratar para rodar com mais de um arquivo , classe principal, objetos(atributos), tem q adicionar um escopo de classe
 int main() {
     yyparse();
     printf("-*-*-*-*-*-* Tabela de simbolos -*-*-*-*-**-*-*--*-\n");
     for(int i=0; i<count; i++) {
-      printf("%s\t%s\t%s\t%d\t%d\t\n", symbol_table[i].name, symbol_table[i].data_type, symbol_table[i].type, symbol_table[i]. scope, symbol_table[i].line);
+      printf("%s\t%s\t%s\t%d\t%d\t%d\t\n", symbol_table[i].name, symbol_table[i].data_type, symbol_table[i].type, symbol_table[i].scope, symbol_table[i].scope_class, symbol_table[i].line);
     }
     for(int i=0;i<count;i++) {
       free(symbol_table[i].name);
@@ -229,11 +235,10 @@ int main() {
       printf("%s\n",errors[i]);
     } 
   }
-
 void check_declaration(const char *c) {    
     query = search(c);    
     if(!query) {        
-        sprintf(errors[count_errors], "Linha %d: estrutura %s nao foi declarada\n", count_line, c);    
+        sprintf(errors[count_errors], "Linha %d: A estrutura %s nao foi declarada\n", count_line, c);    
         count_errors++;    
     }
 }
@@ -276,35 +281,48 @@ void check_type(const char * c1){
   }
 }
 
+void aux_check_class() {
+      strcpy(class_name, yylval.node_struct.name);
+}
+int check_class(){
+  int i;
 
+  for(i=count-1; i>=0; i--) {
+		if(strcmp(symbol_table[i].name, class_name )==0) {
+      return i;
+		}
+	}
+  sprintf(errors[count_errors], "Linha %d: A classe referenciada pelo objeto nao foi existe \n", count_line);    
+  count_errors++;  
+
+	return -1;
+
+}
+
+// procura uma variavel no determinado escopo
 int search(const char *name) {
 	int i;
 	for(i=count-1; i>=0; i--) {
 		if(strcmp(symbol_table[i].name, name)==0) {
-			return -1;
-			break;
+      if(symbol_table[i].scope == count_scope){
+			  return -1;
+			  break;
 		}
+    } 
 	}
 	return 0;
 } 
- /*
-    h - headers
-    k - keywords
-    v - variables
-    c - constants(value)
-    m - methods
-    s - class
-    a - attribute
-    p - parameters
-    o - objects
-*/
+ 
 
-// verifica se as declaracoes de variaveis estao no mesmo escopo
+// verifica se as declaracoes de variaveis estao no mesmo escopo e que uma variavel nao tenha o mesmo nome de um atributo
 int check_scope(const char *name){
   int i;
 	for(i=count-1; i>=0; i--) {
-		if(strcmp(symbol_table[i].name, name)== 0) {
-      if(symbol_table[i].scope == count_scope){
+		if(strcmp(symbol_table[i].name, name)== 0) { // verfica se existe esse nome na tabela
+
+      /*Caso ja tenha esse nome no mesmo escopo ou esse nome já seja um atributo da classe(caso seja de outra classe pode ser utilizado) 
+      */
+      if(symbol_table[i].scope == count_scope || (strcmp(symbol_table[i].type, "attribute") == 0 && symbol_table[i].scope_class == count_scope_class)){ 
 			  return -1;
 			  break;
       }
@@ -328,6 +346,17 @@ void check_return(){
   }
 
 }
+/*
+    h - headers
+    k - keywords
+    v - variables
+    c - constants(value)
+    m - methods
+    s - class
+    a - attribute
+    p - parameters
+    o - objects
+*/
 void add(char c) {
       //query = search(yylval.node_struct.name);
       int result = check_scope(yylval.node_struct.name);
@@ -397,15 +426,20 @@ void add(char c) {
           symbol_table[count].data_type=strdup(type);
           symbol_table[count].line=count_line;
           symbol_table[count].type=strdup("method");
-          count++;
+          symbol_table[count].scope=count_scope+1;
+          //symbol_table[count].scope_class=count_scope_class;
           count_scope++;
+          count++;
+
         }
         else if(c == 's') {
           symbol_table[count].name=strdup(yylval.node_struct.name);
           symbol_table[count].data_type=strdup(type);
           symbol_table[count].line=count_line;
           symbol_table[count].type=strdup("class");
+          symbol_table[count].scope_class=count_scope_class+1;
           count++;
+          count_scope_class++;
         }
 
         else if(c == 'a') {
@@ -413,6 +447,7 @@ void add(char c) {
           symbol_table[count].data_type=strdup(type);
           symbol_table[count].line=count_line;
           symbol_table[count].type=strdup("attribute");
+          symbol_table[count].scope_class=count_scope_class;
           count++;
         }
         else if(c == 'p') {
@@ -420,20 +455,25 @@ void add(char c) {
           symbol_table[count].data_type=strdup(type);
           symbol_table[count].line=count_line;
           symbol_table[count].type=strdup("parameter");
+          symbol_table[count].scope=count_scope;
           count++;
         }
         else if(c == 'o') {
-          symbol_table[count].name=strdup(yylval.node_struct.name);
-          symbol_table[count].data_type=strdup(type);
-          symbol_table[count].line=count_line;
-          symbol_table[count].type=strdup("object");
-          count++;
+          int result = check_class();
+          if(result!=-1){
+            symbol_table[count].name=strdup(yylval.node_struct.name);
+            symbol_table[count].data_type=strdup(type);
+            symbol_table[count].line=count_line;
+            symbol_table[count].type=strdup("object");
+            symbol_table[count].scope=count_scope;
+            symbol_table[count].scope_class=count_scope_class;
+            count++;
+           }
         }
       }
     
-    // caso a variavel/atributo ja tenha sido adicionada
-    else if((c == 'v' || c == 'a') && query) {
-        
+    
+      else{
         sprintf(errors[count_errors], "Linha %d: A estrutura %s ja foi declarada \n", count_line, yylval.node_struct.name);
 		    count_errors++;
     }
