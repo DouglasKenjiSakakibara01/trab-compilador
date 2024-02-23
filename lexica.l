@@ -3,6 +3,8 @@
     #include <stdlib.h>
     #include "y.tab.h"
     int count_line=1;
+    
+
 %}
 
 %option yylineno
@@ -27,7 +29,8 @@ digito [0-9]
 "PARA"	                    { strcpy(yylval.node_struct.name,(yytext)); printf("[%s]: TK_PARA\n",yytext); return TK_PARA; }
 "SE"	                    { strcpy(yylval.node_struct.name,(yytext)); printf("[%s]: TK_SE\n",yytext); return TK_SE; }
 "SENAO"	                    { strcpy(yylval.node_struct.name,(yytext)); printf("[%s]: TK_TIPO_SENAO\n",yytext); return TK_SENAO; }
-^"#INCLUDE"[ ]*<.+\.h>      { strcpy(yylval.node_struct.name,(yytext)); printf("[%s]: TK_TIPO_INCLUDE\n",yytext); return TK_INCLUDE; }
+"VETOR"	                    { strcpy(yylval.node_struct.name,(yytext)); printf("[%s]: TK_VETOR\n",yytext); return TK_VETOR; }
+^"#INCLUDE"[ ]*<.+\.jsc>      { strcpy(yylval.node_struct.name,(yytext)); printf("[%s]: TK_TIPO_INCLUDE\n",yytext); return TK_INCLUDE; }
 "VERDADEIRO"                      { strcpy(yylval.node_struct.name,(yytext)); printf("[%s]: TK_VERDADEIRO\n",yytext); return TK_VERDADEIRO; }
 "FALSO"                     { strcpy(yylval.node_struct.name,(yytext)); printf("[%s]: TK_ESCREVA\n",yytext); return TK_FALSO; }
 [-]?{digito}+                { strcpy(yylval.node_struct.name,(yytext)); printf("[%s]: TK_INT\n",yytext); return TK_INT; }

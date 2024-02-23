@@ -40,7 +40,8 @@
         struct node *right; 
         char *tk; 
     };
-    int count=0; // quantidade de estruturas presentes no codigo
+    //int count=0; // quantidade de estruturas presentes no codigo
+    int count;
     int query;
     char type[10];
     extern int count_line; // representa a linha do codigo analisada 
@@ -53,6 +54,7 @@
     char class_name[30]; // usado para auxiliar na verificacao da classe de um objeto
     char object_name[30]; // usado para auxiliar o acesso a um tributo do objeto
     int index_object = 0;
+    char file_name_current[30];
     
 
     
@@ -75,7 +77,7 @@
 %token <node_struct> TK_ID  TK_TIPO_CHAR TK_TIPO_FLOAT TK_TIPO_INT TK_TIPO_STRING TK_PARA TK_INT
 TK_SE TK_SENAO TK_MAIOR TK_MAIOR_IGUAL TK_MENOR TK_MENOR_IGUAL TK_DIFERENTE TK_FLOAT TK_VERDADEIRO TK_FALSO
 TK_LEIA TK_CHAR TK_STRING TK_ESCREVA TK_INCLUDE TK_RETORNE  TK_TIPO_VAZIO TK_CLASSE 
-TK_SOMA, TK_SUBTRACAO, TK_MULTIPLICACAO, TK_DIVISAO TK_AND TK_OR  TK_NOME_CLASSE TK_IGUALDADE TK_CLASSE_PRINCIPAL TK_METODO_MAIN
+TK_SOMA, TK_SUBTRACAO, TK_MULTIPLICACAO, TK_DIVISAO TK_AND TK_OR  TK_NOME_CLASSE TK_IGUALDADE TK_CLASSE_PRINCIPAL TK_METODO_MAIN TK_VETOR
 
 %type <node_struct> program headers method class class_atributes class_body parameters 
 return body else statement statement_atributes op condition arithmetic  type class_body_main
@@ -85,37 +87,43 @@ return body else statement statement_atributes op condition arithmetic  type cla
 
 program: headers program {$$.nd = add_node($1.nd, $2.nd, "program"); head = $$.nd;}
 //| class program {$$.nd = add_node($1.nd, $2.nd, "program"); }
-| class {$$.nd = add_node($1.nd, NULL , "program"); }
-| headers TK_CLASSE TK_CLASSE_PRINCIPAL {add('s');} '{' class_body_main '}' {$$.nd = add_node($1.nd, $6.nd, "program"); }
+| class {$$.nd = add_node($1.nd, NULL , "program");  head = $$.nd; }
+| headers TK_CLASSE_PRINCIPAL {add('s');} '{' class_body_main '}' {
+  $2.nd = add_node($5.nd, NULL, "program");//
+  $$.nd = add_node($1.nd, $5.nd, "program");  
+  head = $$.nd;
+}
 |{ $$.nd = NULL; }
 ;
 
 headers: TK_INCLUDE {add('h');} {$$.nd = add_node(NULL, NULL, "INCLUDE");}
-|TK_INCLUDE {add('h');} headers {$$.nd = add_node($3.nd, NULL, "INCLUDE2");}
+|TK_INCLUDE {add('h');} headers {$$.nd = add_node($3.nd, NULL, "INCLUDE");}
 |{$$.nd = NULL;}
 ;
+
+class_body_main: TK_METODO_MAIN {add('m');} '(' parameters ')' '{' body '}';
 
 class: TK_CLASSE TK_NOME_CLASSE {add('s');} '{' class_body '}'  {$$.nd = add_node($5.nd, NULL, "class");}
 ;
 
-class_body_main: type TK_METODO_MAIN {add('m');} '(' parameters ')' '{' body '}';
 
-class_body: class_atributes class_body {$$.nd = add_node($1.nd, $2.nd, "class_body_atributes");}
-|  TK_NOME_CLASSE {aux_check_class();} TK_ID {add('o');} ';' class_body {$$.nd = add_node($6.nd, NULL, "class_body_object");}
+class_body: class_atributes class_body {$$.nd = add_node($1.nd, $2.nd, "attribute");}
+//|  TK_NOME_CLASSE {aux_check_class();} TK_ID {add('o');} ';' class_body {$$.nd = add_node($6.nd, NULL, "object_declaration");}
 |  method '(' parameters ')' '{' body return '}' class_body{
-   struct node *aux = add_node($6.nd, $7.nd, "class_body_method_aux");
-   struct node *aux2 = add_node(&*aux, $9.nd, "class_body_method_aux2");
-   struct node *aux3 = add_node($1.nd, $3.nd, "class_body_method_aux3");
+   struct node *aux = add_node($6.nd, $7.nd, "body_method");
+   struct node *aux2 = add_node(&*aux, $9.nd, "body_method");
+   struct node *aux3 = add_node($1.nd, $3.nd, "body_method");
    $$.nd = add_node(aux3, aux2, "class_body_method");
 }
 |  {$$.nd = NULL;}
 ;
 
-class_atributes: statement_atributes ';' {$$.nd = add_node($1.nd, NULL, "class_atributes");}
+class_atributes: statement_atributes ';' {$$.nd = add_node($1.nd, NULL, "attributes_declaration");}
 ;
 
-statement_atributes:  type TK_ID {add('a');} '=' expression {$$.nd = add_node($1.nd, $5.nd, "statement_atributes2");}
-| type TK_ID {add('a');} {$$.nd = add_node($1.nd, NULL, "statement_atributes2");} // declaracao objeto
+statement_atributes: TK_NOME_CLASSE {aux_check_class();} TK_ID {add('o'); $$.nd = add_node(NULL, NULL, "declaration");}
+| type TK_ID {add('a');} {$$.nd = add_node($1.nd, NULL, "declaration");}
+| type TK_VETOR TK_ID {add('a'); $$.nd = add_node($1.nd, NULL, "declaration"); } 
 ;
 
 method: type TK_ID {add('m');} {$$.nd = add_node($1.nd, NULL, "method");}
@@ -123,15 +131,15 @@ method: type TK_ID {add('m');} {$$.nd = add_node($1.nd, NULL, "method");}
 
 
 parameters: type TK_ID {add('p');} ',' parameters {$$.nd = add_node($1.nd, $5.nd, "parameters");}
-| type TK_ID {add('p'); $$.nd = add_node($1.nd, NULL, "parameters2");}
+| type TK_ID {add('p'); $$.nd = add_node($1.nd, NULL, "parameters");}
 | {$$.nd = NULL;}
 ;
 
 //tentar tirar essa recursao a esquerda 
 body: TK_PARA {add('k');} '(' statement ';' condition ';' statement ')' '{' body '}'{
-  struct node *aux = add_node($6.nd, $8.nd, "body_for_aux"); 
-  struct node *aux2 = add_node($4.nd, aux, "body_for_aux2"); 
-  $$.nd = add_node(aux2, $11.nd, "body_for"); 
+  struct node *aux = add_node($6.nd, $8.nd, "statement_for"); 
+  struct node *aux2 = add_node($4.nd, aux, "condition_for"); 
+  $$.nd = add_node(aux2, $11.nd, "for"); 
 }
 /*
 | TK_SE {add('k');} '(' condition ')' '{' body '}' else {
@@ -139,72 +147,78 @@ body: TK_PARA {add('k');} '(' statement ';' condition ';' statement ')' '{' body
   $$.nd = add_node(aux, $9.nd, "body_if");
 }
 */
-| TK_SE {add('k');} '(' condition ')' '{' body '}' {$$.nd = add_node($4.nd, $7.nd, "body_if");}
-| else {  $$.nd = add_node($1.nd, NULL, "body_if");} 
-| statement ';' {$$.nd = add_node($1.nd, NULL, "body_statement");}
-| TK_NOME_CLASSE {aux_check_class();} TK_ID {add('o');} ';' {$$.nd = add_node(NULL, NULL, "body_object");} // declaracao objeto
-| TK_ID { check_declaration($1.name); } '.' TK_ID {check_declaration2($4.name);} ';'
-| TK_ID { check_declaration($1.name); } '.' TK_ID {check_declaration2($4.name);} '=' expression ';'
+| TK_SE {add('k');} '(' condition ')' '{' body '}' {$$.nd = add_node($4.nd, $7.nd, "if");}
+| else {  $$.nd = add_node($1.nd, NULL, "else");} 
+| statement ';' {$$.nd = add_node($1.nd, NULL, "statement");}
+| TK_NOME_CLASSE {aux_check_class();} TK_ID {add('o');} ';' {$$.nd = add_node(NULL, NULL, "object");} // declaracao objeto
 | body body  {$$.nd = add_node($1.nd, $2.nd, "body");}
-| TK_ESCREVA {add('k');} '(' TK_STRING ')' ';' {$$.nd = add_node(NULL, NULL, "body_printf");}
-| TK_LEIA {add('k');} '(' TK_STRING ',' '&' TK_ID ')' ';' {$$.nd = add_node(NULL, NULL, "body_scanf");}
+| TK_ESCREVA {add('k');} '(' TK_STRING ')' ';' {$$.nd = add_node(NULL, NULL, "printf");}
+| TK_LEIA {add('k');} '(' TK_STRING ',' '&' TK_ID ')' ';' {$$.nd = add_node(NULL, NULL, "scanf");}
 ;
 
-else: TK_SENAO {add('k');} '{' body '}' {$$.nd = add_node($4.nd, NULL, "else_body");}
+else: TK_SENAO {add('k');} '{' body '}' {$$.nd = add_node($4.nd, NULL, "body_else");}
 | {$$.nd = NULL;}
 ;
 
 
-statement: type TK_ID {add('v');} {$$.nd = add_node($1.nd, NULL, "statement1");}
-| type TK_ID  {add('v');} '=' expression  {$$.nd = add_node($1.nd, $5.nd, "statement2"); check_type($2.name);}
-| TK_ID {check_declaration($1.name);} '=' expression {$$.nd = add_node($4.nd, NULL, "statement3"); check_type($1.name);}
-| TK_ID {check_declaration($1.name);} op expression {$$.nd = add_node($3.nd, $3.nd, "statement4");}
+statement: type TK_ID {add('v');} {$$.nd = add_node($1.nd, NULL, "statement_id");}
+| type TK_ID  {add('v');} '=' expression  {$$.nd = add_node($1.nd, $5.nd, "attribuition_id"); check_type($2.name);}
+| type TK_VETOR TK_ID {add('v'); $$.nd = add_node($1.nd, NULL, "statement_array"); } 
+| type TK_VETOR TK_ID {add('v');} '=' expression {$$.nd = add_node($1.nd, $6.nd, "attribuition_array"); } 
+| TK_ID {check_declaration($1.name);} '=' expression {$$.nd = add_node($4.nd, NULL, "attribuition_id"); check_type($1.name);}
+| TK_ID {check_declaration($1.name);} op expression {$$.nd = add_node($3.nd, $4.nd, "expression_logic");}
+| TK_ID {check_declaration($1.name);} '['TK_INT']' {$$.nd = add_node(NULL, NULL, "array");}
+| TK_ID {check_declaration($1.name);} '['TK_INT']' op expression {$$.nd = add_node($6.nd, $7.nd, "array_logic");}
+| TK_ID {check_declaration($1.name);} '['TK_INT']' '=' expression {$$.nd = add_node($7.nd, NULL, "attribuition_array");}
+| TK_ID { check_declaration($1.name); } '.' TK_ID {check_declaration2($4.name);}  {$$.nd = add_node(NULL, NULL, "acess_array");}
+| TK_ID { check_declaration($1.name); } '.' TK_ID {check_declaration2($4.name);} op expression  {$$.nd = add_node($6.nd, $7.nd, "array_logic");}
+| TK_ID { check_declaration($1.name); } '.' TK_ID {check_declaration2($4.name);} '=' expression {$$.nd = add_node($7.nd, NULL, "attribuition_array");}
 ;
 
 
-type: TK_TIPO_INT {insert_type();} {$$.nd = add_node(NULL, NULL, "type_int");}
-| TK_TIPO_FLOAT {insert_type();} {$$.nd = add_node(NULL, NULL, "type_float");}
-| TK_TIPO_CHAR {insert_type();} {$$.nd = add_node(NULL, NULL, "type_char");}
-| TK_TIPO_STRING {insert_type();} {$$.nd = add_node(NULL, NULL, "type_string");}
-| TK_TIPO_VAZIO {insert_type();} {$$.nd = add_node(NULL, NULL, "type_void");}
+type: TK_TIPO_INT {insert_type();} 
+| TK_TIPO_FLOAT {insert_type();} 
+| TK_TIPO_CHAR {insert_type();} 
+| TK_TIPO_STRING {insert_type();} 
+| TK_TIPO_VAZIO {insert_type();} 
 ;
 
 
 condition: value op value  {
-  struct node *aux = add_node($2.nd, $3.nd, "condition_aux"); 
-  $$.nd = add_node($1.nd, aux, "condition");
+  struct node *aux = add_node($2.nd, $3.nd, "expression_condition"); 
+  $$.nd = add_node($1.nd, aux, "expression_condition");
 }
-| TK_VERDADEIRO {add('k');} {$$.nd = add_node(NULL, NULL, "condition_true");}
-| TK_FALSO {add('k');} {$$.nd = add_node(NULL, NULL, "condition_false");}
+| TK_VERDADEIRO {add('k'); $$.nd = NULL;}
+| TK_FALSO {add('k'); $$.nd = NULL;}
 | expression TK_IGUALDADE expression {$$.nd = add_node($1.nd, $3.nd, "condition_equal");}
 ;
 
 //tentar tirar a recursao a esquerda
 expression: expression arithmetic expression {
-  struct node *aux = add_node($2.nd, $3.nd, "expression1_aux"); 
+  struct node *aux = add_node($2.nd, $3.nd, "expression_arithmetic"); 
   $$.nd = add_node($1.nd, aux, "expression1");
 }
 | '(' expression arithmetic expression ')'{
-  struct node *aux = add_node($3.nd, $4.nd, "expression2_aux"); 
+  struct node *aux = add_node($3.nd, $4.nd, "expression_arithmetic"); 
   $$.nd = add_node($2.nd, aux, "expression2");
 }
-| value {$$.nd = add_node($1.nd, NULL, "expresion3");}
-| expression TK_AND expression {add_node($1.nd, $3.nd, "expresion4");}
-| expression TK_OR expression {add_node($1.nd, $3.nd, "expresion5");}
-| '(' value ')' {add_node($2.nd, NULL, "expresion6");}
+| value {$$.nd = add_node($1.nd, NULL, "value");}
+| expression TK_AND expression {add_node($1.nd, $3.nd, "expresion_and");}
+| expression TK_OR expression {add_node($1.nd, $3.nd, "expresion_or");}
+| '(' value ')' {add_node($2.nd, NULL, "value");}
 ;
 
-arithmetic: TK_SOMA {$$.nd = add_node(NULL, NULL, "arithmetic_sum");}
-| TK_SUBTRACAO  {$$.nd = add_node(NULL, NULL, "arithmetic_sub");}
-| TK_MULTIPLICACAO {$$.nd = add_node(NULL, NULL, "arithmetic_mult");}
-| TK_DIVISAO {$$.nd = add_node(NULL, NULL, "arithmetic_div");}
+arithmetic: TK_SOMA 
+| TK_SUBTRACAO  
+| TK_MULTIPLICACAO 
+| TK_DIVISAO 
 ;
 
-op: TK_MAIOR {$$.nd = add_node(NULL, NULL, "op_>");}
-| TK_MAIOR_IGUAL {$$.nd = add_node(NULL, NULL, "op_>=");}
-| TK_MENOR {$$.nd = add_node(NULL, NULL, "op_<");}
-| TK_MENOR_IGUAL {$$.nd = add_node(NULL, NULL, "op_<=");}
-| TK_DIFERENTE {$$.nd = add_node(NULL, NULL, "op_!=");}
+op: TK_MAIOR 
+| TK_MAIOR_IGUAL 
+| TK_MENOR 
+| TK_MENOR_IGUAL 
+| TK_DIFERENTE 
 ;
 
 value: TK_INT {add('c');} {$$.nd = add_node(NULL, NULL, "value_int");}
@@ -220,33 +234,58 @@ return: TK_RETORNE {add('k');} value ';' {$$.nd = add_node($3.nd, NULL, "return"
 
 %%
 
-// falta tratar para rodar com mais de um arquivo , classe principal
-int main() {
-    yyparse();
+int main(int argc, char **argv) {
+    int i;
+    printf("%s\n", argv[i]);
+    for (i = 1; i < argc; i++) {
+        strcpy(file_name_current, argv[i]);
+        FILE *fp = fopen(argv[i], "r");
+        
+        if (fp == NULL) {
+            printf("Erro: O arquivo %s nao pode ser aberto\n", argv[i]);
+            return 1;
+          }
+          
+          
+        // yyin is a variable of the type FILE* and points to the input file.
+        yyin = fp;
+
+        yyparse();
+
+        fclose(fp);
+         printf("\n\n");
+          printf("-*-*-*-*-*-* Arvore sintatica - %s -*-*-*-*-**-*-*--*-\n\n", argv[i]);
+          print_tree(head);
+          printf("\n\n");
+    }
+    
+    //yyparse();
     printf("-*-*-*-*-*-* Tabela de simbolos -*-*-*-*-**-*-*--*-\n");
     for(int i=0; i<count; i++) {
-      printf("%s\t%s\t%s\t%d\t%d\t%d\t\n", symbol_table[i].name, symbol_table[i].data_type, symbol_table[i].type, symbol_table[i].scope, symbol_table[i].scope_class, symbol_table[i].line);
+      printf("%-30s\t%-10s\t%-10s\t%-10d\t%-10d\t%-10d\t\n", symbol_table[i].name, symbol_table[i].data_type, symbol_table[i].type, symbol_table[i].scope, symbol_table[i].scope_class, symbol_table[i].line);
     }
     for(int i=0;i<count;i++) {
       free(symbol_table[i].name);
       free(symbol_table[i].type);
     }
-    
+    /*
     printf("\n\n");
     printf("-*-*-*-*-*-* Arvore sintatica -*-*-*-*-**-*-*--*-\n\n");
     print_tree(head);
     printf("\n\n");
-
-    printf(" Quantidade de erros:%d\n",count_errors);
+*/
+    printf("Quantidade de erros:%d\n",count_errors);
     for(int i=0; i<count_errors; i++) {
       printf("%s\n",errors[i]);
     } 
+    
+    
   }
 // usado para verificar a declaracao de variaveis e atributos   
 void check_declaration(const char *c) {    
     query = search(c);    
     if(query == -1) {        
-        sprintf(errors[count_errors], "Linha %d: A estrutura %s nao foi declarada\n", count_line, c);    
+        sprintf(errors[count_errors], "Arquivo(%s) - Linha %d: A estrutura %s nao foi declarada\n", file_name_current, count_line, c);    
         count_errors++;    
     }
     else{
@@ -261,7 +300,7 @@ void check_declaration(const char *c) {
 void check_declaration2(const char *c) {    
     query = search2(c);    
     if(query ==-1) {        
-        sprintf(errors[count_errors], "Linha %d: A estrutura %s sendo acessado pelo objeto nao foi declarada\n", count_line, c);    
+        sprintf(errors[count_errors], "Arquivo(%s) - Linha %d: A estrutura %s sendo acessado pelo objeto nao foi declarada\n", file_name_current, count_line, c);    
         count_errors++;    
     }
 }
@@ -298,7 +337,7 @@ void check_type(const char * c1){
 	}
   if(index_var!=-1){
     if(strcmp(symbol_table[index_var].data_type, symbol_table[index_value].data_type)){
-      sprintf(errors[count_errors], "Linha %d: A estrutura %s do tipo %s recebe um valor do tipo %s\n", count_line, symbol_table[index_var].name, symbol_table[index_var].data_type, symbol_table[index_value].data_type);    
+      sprintf(errors[count_errors], "Arquivo(%s) - Linha %d: A estrutura %s do tipo %s recebe um valor do tipo %s\n", file_name_current, count_line, symbol_table[index_var].name, symbol_table[index_var].data_type, symbol_table[index_value].data_type);    
       count_errors++;  
     }
   }
@@ -315,7 +354,7 @@ int check_class(){
       return i;
 		}
 	}
-  sprintf(errors[count_errors], "Linha %d: A classe referenciada pelo objeto nao foi existe \n", count_line);    
+  sprintf(errors[count_errors], "Arquivo(%s) - Linha %d: A classe referenciada pelo objeto nao existe \n", file_name_current, count_line);    
   count_errors++;  
 
 	return -1;
@@ -341,6 +380,7 @@ int search2(const char *name) {
 	for(i=count-1; i>=0; i--) {
 		if(strcmp(symbol_table[i].name, name)==0) {
       if(index_object !=0){
+        // verifica se atributo ou metodo acessado está no objeto da classe e nao em outra 
         if(symbol_table[index_object].scope_class == symbol_table[i].scope_class){
           index_object = 0;
           return i;
@@ -380,7 +420,7 @@ void check_return(){
     }
   }
   if(symbol_table[index_method].data_type!="VAZIO" && strcmp(symbol_table[count-1].data_type,symbol_table[index_method].data_type )){
-    sprintf(errors[count_errors], "Linha %d: A funcao %s do tipo %s retorna um valor do tipo %s\n", count_line, symbol_table[index_method].name, symbol_table[index_method].data_type, symbol_table[count-1].data_type);    
+    sprintf(errors[count_errors], "Arquivo(%s) - Linha %d: A funcao %s do tipo %s retorna um valor do tipo %s\n", file_name_current,count_line, symbol_table[index_method].name, symbol_table[index_method].data_type, symbol_table[count-1].data_type);    
     count_errors++;  
 
   }
@@ -396,6 +436,7 @@ void check_return(){
     a - attribute
     p - parameters
     o - objects
+    l - list(vector)
 */
 void add(char c) {
       //query = search(yylval.node_struct.name);
@@ -511,11 +552,21 @@ void add(char c) {
             count++;
            }
         }
+        /*
+        else if(c == 'l') {
+          symbol_table[count].name=strdup(yylval.node_struct.name);
+          symbol_table[count].data_type=strdup(type);
+          symbol_table[count].line=count_line;
+          symbol_table[count].type=strdup("list");
+          symbol_table[count].scope=count_scope;
+          count++;
+        }
+        */
       }
     
     
       else{
-        sprintf(errors[count_errors], "Linha %d: A estrutura %s ja foi declarada \n", count_line, yylval.node_struct.name);
+        sprintf(errors[count_errors], "Arquivo(%s) - Linha %d: A estrutura %s ja foi declarada \n", file_name_current,count_line, yylval.node_struct.name);
 		    count_errors++;
     }
       

@@ -1,5 +1,4 @@
-#INCLUDE <teste.h>
-#INCLUDE <teste2.h>
+//#INCLUDE <teste.jsc>
 CLASSE Teste{
     INT var1;
     INT var2;
@@ -19,6 +18,7 @@ CLASSE Teste{
         c='c'; // (erro)
         Teste f;
         f.var4;
+        INT VETOR vetor;
         
         PARA(INT d=0; d>20; d=d+1){
             ESCREVA("teste for");

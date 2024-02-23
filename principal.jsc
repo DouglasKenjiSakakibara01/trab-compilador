@@ -1,0 +1,6 @@
+//#INCLUDE <teste.jsc>
+Principal{
+    MAIN(){
+        INT a="erro"; // (erro)
+    }
+}
