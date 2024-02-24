@@ -2,7 +2,8 @@
     #include <stdio.h>
     #include <stdlib.h>
     #include "y.tab.h"
-    int count_line=1;
+    //int count_line=1;
+    int count_line;
     
 
 %}
